@@ -659,7 +659,7 @@ Re-run the same tests discovered in Section 1.9 to verify the upgrade has
 not introduced regressions.
 
 ```bash
-# Run all available tests (use commands discovered in 1.7)
+# Run all available tests (use commands discovered in 1.9)
 # Example using ahoy:
 ahoy test-unit
 ahoy test-bdd
