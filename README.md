@@ -2,6 +2,17 @@
 
 **Status: Experimental** – this repository houses a documentation‑first, planning‑first framework to help developers and AI assistants plan and execute CivicTheme upgrades in Drupal projects. It is not a plug‑and‑play module; it is a set of conventions, specs, checklists, and runbooks that still require careful developer review.
 
+## Purpose
+
+The primary goal of this framework is to **enable AI coding tools** (Codex, Claude Code, Cursor, GitHub Copilot, and others) to perform the majority of CivicTheme upgrade work. The framework provides structured documentation, specifications, and workflows that AI assistants can follow to:
+
+- Automatically analyse upstream CivicTheme changes
+- Identify and assess customisations in your project
+- Generate upgrade plans, checklists, and runbooks
+- Execute upgrade tasks with minimal manual intervention
+
+Additionally, this framework assists in **automatically capturing customisations** by leveraging git log analysis to understand what has been customised in your CivicTheme sub‑theme and project‑specific overrides. This automated customisation detection reduces manual documentation overhead and ensures your customisation register stays current.
+
 ## Disclaimer
 
 This upgrade assistant framework is provided as a standalone utility and is **not** part of, nor officially supported by, the CivicTheme Drupal project or any CivicTheme maintainers. It is intended to assist with planning and executing common upgrade tasks but is provided “as is” without any warranties or guarantees of any kind, either expressed or implied.
