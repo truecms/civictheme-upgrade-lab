@@ -354,6 +354,14 @@ inventory, risk areas for this upgrade are categorised by severity.
     scripts.
   - **Action**: Use the CivicTheme SDC Update Tool or manually update
     build configuration.
+- **Component completeness (missing Twig template)**:
+  - After SDC conversion, a custom component directory that keeps only a
+    `.component.yml` without a matching `.twig` will trigger
+    `InvalidComponentException: Unable to find the Twig template for the
+    component`.
+  - **Action**: Ensure each component has a Twig template; copy the upstream
+    component (e.g. Table of Contents) into the sub-theme or remove the stale
+    `.component.yml` before clearing caches.
 
 - **Custom components without SDC metadata**:
   - Custom sub-theme components may need `.component.yml` files to be

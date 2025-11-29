@@ -260,7 +260,58 @@ echo "=== Package.json dependencies ==="
 grep "@civictheme" $SUBTHEME_PATH/package.json 2>/dev/null || echo "No @civictheme deps found"
 ```
 
-### 2.4 Document findings (T104)
+### 2.4 Use CivicTheme upgrade-tools (optional helper) (T116a)
+
+The CivicTheme upgrade-tools repository includes `storybook-v8-update`/`sdc-update`
+helpers that can refresh build tooling (Vite/Storybook v8) and convert
+Storybook stories to the controls API. These steps are intentionally generic so
+they can be reused across projects.
+
+**Prerequisites**
+
+- Node.js ≥ 22
+- Anthropic API key available as `ANTHROPIC_API_KEY`
+- Clean working copy or feature branch (the tool rewrites `package.json`,
+  `.storybook`, `build.js`, component stories)
+
+**Execution (non-interactive recommended)**
+
+```bash
+# 1) Clone tools (or reuse an existing checkout)
+git clone https://github.com/civictheme/upgrade-tools.git /tmp/civictheme-upgrade-tools
+cd /tmp/civictheme-upgrade-tools/storybook-v8-update
+
+# 2) Install dependencies
+npm install
+
+# 3) Update build + Storybook configs for your sub-theme
+SUBTHEME_DIRECTORY=/absolute/path/to/your/subtheme \
+  ./scripts/update-build-and-storybook.sh
+
+# 4) (Optional) Convert Storybook stories using AI
+SUBTHEME_DIRECTORY=/absolute/path/to/your/subtheme \
+ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY \
+node -e "import('./scripts/convert-subtheme-storybook.mjs').then(m => m.default())"
+```
+
+**Observed issues and workarounds**
+
+- *Model not found / unsupported*: Edit `scripts/convert-subtheme-storybook.mjs`
+  and set `model` to an available Anthropic model (e.g.
+  `claude-sonnet-4-5-20250929`).
+- *Sass embedded binary missing*: Install optional platform-specific
+  `sass-embedded-*` packages or temporarily switch `build.js` to use `sass`
+  instead of `sass-embedded` and rerun the build.
+- *CivicTheme path detection wrong*: After the tool runs, ensure
+  `build-config.json` points to the contrib Civictheme directory (e.g.
+  `../contrib/civictheme`). If overwritten, restore the correct path before
+  building.
+- *Interactive menu crashes*: Use the direct script invocation above instead of
+  the interactive `npm run update-storybook` prompt.
+- *Story diffs*: Manually review converted stories—long/complex stories may
+  need hand edits.
+
+### 2.5 Document findings (T104)
 
 Update the customisation register with:
 - List of templates requiring include syntax updates.
@@ -525,6 +576,22 @@ git status  # Review all changes
 # Commit in logical chunks if preferred
 git commit -m "feat: Updated sub-theme for CivicTheme 1.11 SDC migration"
 ```
+
+### 3.11 Known issues and workarounds
+
+- **InvalidComponentException: Unable to find Twig template for component** —
+  can occur if a custom component directory contains a `.component.yml` but no
+  matching `.twig` after SDC conversion (e.g. custom Table of Contents). Fix by
+  adding the missing Twig template (copy upstream component if needed) or
+  removing the stale `.component.yml`, then clear caches (`drush cr`).
+- **Sass embedded binary missing** — install optional `sass-embedded-<platform>`
+  packages or temporarily point `build.js` to `sass` and rerun the build.
+- **Story conversion model unavailable** — set `model` in
+  `scripts/convert-subtheme-storybook.mjs` to an available Anthropic model
+  (e.g. `claude-sonnet-4-5-20250929`).
+- **Wrong CivicTheme path in build-config** — ensure `build-config.json`
+  `civicthemePath` points to the contrib Civictheme directory after running
+  upgrade-tools.
 
 ---
 
@@ -818,7 +885,8 @@ to Single Directory Components (SDC).
 - [ ] Storybook builds successfully
 
 ### Known Issues / Follow-ups
-- [List any remaining issues]
+- CivicTheme 1.11 splits CSS by component and no longer bundles custom component styles into a single `styles.css`. Any bespoke Twig that renders custom markup (not an SDC component) can lose styling. Fix: add a theme library that points to the generated component CSS (e.g. `components_combined/05-pages/<component>/<component>.css`) and attach it in the Twig template, or restore a project-level bundle that imports those components. Example fix for events: add an `event-page` library pointing to `components_combined/05-pages/event/event.css` and call `attach_library('theme/event-page')` on the event node template.
+- Custom workshop filter banner on `/events/supervisory-groups-workshops` lost styling because the `component.workshop-filter` library only loaded JS. Add the compiled CSS (`components_combined/02-molecules/workshop-filter/workshop-filter.css`) to the library (or include in a site bundle) and keep the page attachment in place so the dark background, spacing, and reset button styling persist after upgrades.
 
 ### Documentation
 See `docs/civic-theme-upgrades/versions/v1.10.0-to-v1.11.0/` for full
