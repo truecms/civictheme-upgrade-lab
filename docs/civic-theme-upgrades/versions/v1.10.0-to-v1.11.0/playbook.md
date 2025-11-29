@@ -50,13 +50,22 @@ drush status
 **Throughout this playbook**, commands are shown in native form. Prefix with
 `ahoy` or `docker compose exec cli` as appropriate for your environment.
 
-### 1.3 Create backups
+### 1.3 Preserve existing `.gitignore`
+
+**IMPORTANT**: Do NOT modify the existing `.gitignore` file in the sub-theme or
+project. The theme is already operational and its ignored files and folders
+(such as `node_modules/`, `dist/`, vendor directories, and build artefacts) are
+correctly configured.
+
+- [ ] Confirmed `.gitignore` will not be modified during this upgrade.
+
+### 1.4 Create backups
 
 - [ ] Database backup created and verified.
 - [ ] Files backup created (if applicable).
 - [ ] Able to restore to pre-upgrade state if needed.
 
-### 1.4 Create dedicated feature branch
+### 1.5 Create dedicated feature branch
 
 ```bash
 cd /path/to/drupal/project
@@ -65,7 +74,7 @@ git pull origin develop
 git checkout -b feature/civictheme-1.11-upgrade
 ```
 
-### 1.5 Verify Drupal core version
+### 1.6 Verify Drupal core version
 
 ```bash
 # Check Drupal core version (use ahoy/docker as needed)
@@ -79,14 +88,14 @@ composer show drupal/core | grep versions
 CivicTheme 1.11.0 requires `core_version_requirement: ^10.2 || ^11`.
 Plan a separate Drupal core upgrade first.
 
-### 1.6 Verify current CivicTheme version
+### 1.7 Verify current CivicTheme version
 
 ```bash
 composer show drupal/civictheme | grep versions
 # Expected: 1.10.0
 ```
 
-### 1.7 Discover available front-end commands
+### 1.8 Discover available front-end commands
 
 Before making changes, identify how front-end tooling (npm) is run in this
 project. In Docker environments, npm commands typically run inside a
@@ -119,7 +128,7 @@ fi
 
 **Key insight**: `ahoy fe` is equivalent to running `npm run build` from the theme directory, but can be invoked from the project root. Use this as the primary command for rebuilding front-end assets.
 
-### 1.8 Discover available test commands
+### 1.9 Discover available test commands
 
 Identify what testing capabilities exist in the project. This establishes
 the baseline for regression testing.
@@ -153,7 +162,7 @@ grep -A 30 '"scripts"' composer.json | grep -i "test" || echo "No test scripts f
 | `ahoy test-???` | [Describe] | Available/Not available |
 | `composer test-???` | [Describe] | Available/Not available |
 
-### 1.9 Run tests BEFORE upgrade (baseline)
+### 1.10 Run tests BEFORE upgrade (baseline)
 
 **Critical**: Establish that tests pass before making any changes. If tests
 fail before the upgrade, fix them first or document known failures.
@@ -183,7 +192,7 @@ Record test results:
 **STOP CONDITION**: If critical tests fail before the upgrade, resolve those
 issues first. Do not proceed with upgrade on a broken test baseline.
 
-### 1.10 Review upgrade documentation
+### 1.11 Review upgrade documentation
 
 - [ ] Read `spec.md` Section 3 (High-level upstream changes).
 - [ ] Read `spec.md` Section 5 (Risk assessment).
@@ -646,7 +655,7 @@ ls -la dist/
 
 ### 4.7 Run tests AFTER upgrade (T125b)
 
-Re-run the same tests discovered in Section 1.7 to verify the upgrade has
+Re-run the same tests discovered in Section 1.9 to verify the upgrade has
 not introduced regressions.
 
 ```bash
@@ -664,7 +673,7 @@ docker compose exec cli ./vendor/bin/phpunit
 docker compose exec cli ./vendor/bin/behat
 ```
 
-**Compare results with pre-upgrade baseline (Section 1.8)**:
+**Compare results with pre-upgrade baseline (Section 1.10)**:
 
 | Test Suite | Before Upgrade | After Upgrade | Status |
 |------------|----------------|---------------|--------|

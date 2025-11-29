@@ -38,13 +38,22 @@ for nginx, php-fpm, and a CLI container. Commands that interact with Drupal
 **Throughout this playbook**, commands are shown in native form. Prefix with
 `ahoy` or `docker compose exec cli` as appropriate for your environment.
 
-### 1.3 Create backups
+### 1.3 Preserve existing `.gitignore`
+
+**IMPORTANT**: Do NOT modify the existing `.gitignore` file in the sub-theme or
+project. The theme is already operational and its ignored files and folders
+(such as `node_modules/`, `dist/`, vendor directories, and build artefacts) are
+correctly configured.
+
+- [ ] Confirmed `.gitignore` will not be modified during this upgrade.
+
+### 1.4 Create backups
 
 - [ ] Database backup created and verified.
 - [ ] Files backup created (if applicable).
 - [ ] Able to restore to pre-upgrade state if needed.
 
-### 1.4 Create dedicated feature branch
+### 1.5 Create dedicated feature branch
 
 ```bash
 cd /path/to/drupal/project
@@ -53,14 +62,14 @@ git pull origin develop
 git checkout -b feature/civictheme-1.12.1-upgrade
 ```
 
-### 1.5 Verify current CivicTheme version
+### 1.6 Verify current CivicTheme version
 
 ```bash
 composer show drupal/civictheme | grep versions
 # Expected: 1.12.0
 ```
 
-### 1.6 Verify Drupal core version
+### 1.7 Verify Drupal core version
 
 ```bash
 # Check Drupal core version (use ahoy/docker as needed)
