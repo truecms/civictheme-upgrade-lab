@@ -54,13 +54,22 @@ drush status
 **Throughout this playbook**, commands are shown in native form. Prefix with
 `ahoy` or `docker compose exec cli` as appropriate for your environment.
 
-### 1.3 Create backups
+### 1.3 Preserve existing `.gitignore`
+
+**IMPORTANT**: Do NOT modify the existing `.gitignore` file in the sub-theme or
+project. The theme is already operational and its ignored files and folders
+(such as `node_modules/`, `dist/`, vendor directories, and build artefacts) are
+correctly configured.
+
+- [ ] Confirmed `.gitignore` will not be modified during this upgrade.
+
+### 1.4 Create backups
 
 - [ ] Database backup created and verified.
 - [ ] Files backup created (if applicable).
 - [ ] Able to restore to pre-upgrade state if needed.
 
-### 1.4 Create dedicated feature branch
+### 1.5 Create dedicated feature branch
 
 ```bash
 cd /path/to/drupal/project
@@ -69,7 +78,7 @@ git pull origin develop
 git checkout -b feature/civictheme-1.12-upgrade
 ```
 
-### 1.5 Verify Drupal core version
+### 1.6 Verify Drupal core version
 
 ```bash
 # Check Drupal core version (use ahoy/docker as needed)
@@ -81,14 +90,14 @@ composer show drupal/core | grep versions
 
 **Requirement**: Drupal core must meet `^10.2 || ^11` (unchanged from 1.11.0).
 
-### 1.6 Verify current CivicTheme version
+### 1.7 Verify current CivicTheme version
 
 ```bash
 composer show drupal/civictheme | grep versions
 # Expected: 1.11.x
 ```
 
-### 1.7 Discover available front-end commands
+### 1.8 Discover available front-end commands
 
 ```bash
 # Check for ahoy front-end commands
@@ -105,10 +114,9 @@ fi
 
 | Command | Description | Usage |
 |---------|-------------|-------|
-| `ahoy fe` | Full front-end build (standalone) | Runs npm install + build automatically |
-| `ahoy fe <cmd>` | Run specific npm command | `ahoy fe npm run storybook` |
+| `ahoy fe` | Front-end build (equivalent to `npm run build` from theme directory) | Can be invoked from project root |
 
-### 1.8 Discover available test commands
+### 1.9 Discover available test commands
 
 ```bash
 # Check for ahoy test commands
@@ -122,7 +130,7 @@ echo "=== Composer test scripts ==="
 grep -A 30 '"scripts"' composer.json | grep -i "test" || echo "No test scripts found"
 ```
 
-### 1.9 Run tests BEFORE upgrade (baseline)
+### 1.10 Run tests BEFORE upgrade (baseline)
 
 **Critical**: Establish that tests pass before making any changes.
 
@@ -143,7 +151,7 @@ Record test results:
 **STOP CONDITION**: If critical tests fail before the upgrade, resolve those
 issues first. Do not proceed with upgrade on a broken test baseline.
 
-### 1.10 Review security advisories
+### 1.11 Review security advisories
 
 Before proceeding, review the security context:
 
@@ -670,12 +678,8 @@ Security fixes are the priority.
 ### 3.12 Rebuild sub-theme assets (T221)
 
 ```bash
-# RECOMMENDED: Using ahoy fe (standalone - does everything)
+# RECOMMENDED: Using ahoy fe (equivalent to npm run build from theme directory)
 ahoy fe
-
-# Alternative: Using ahoy fe with specific commands
-ahoy fe npm install
-ahoy fe npm run build
 
 # Alternative: Native (non-Docker environments)
 cd $SUBTHEME_PATH
@@ -911,7 +915,7 @@ ls -la dist/
 
 ### 4.10 Run tests AFTER upgrade (T239)
 
-Re-run the same tests discovered in Section 1.8 to verify the upgrade has
+Re-run the same tests discovered in Section 1.9 to verify the upgrade has
 not introduced regressions.
 
 ```bash
@@ -921,7 +925,7 @@ ahoy test-bdd
 composer test
 ```
 
-**Compare results with pre-upgrade baseline (Section 1.9)**:
+**Compare results with pre-upgrade baseline (Section 1.10)**:
 
 | Test Suite | Before Upgrade | After Upgrade | Status |
 |------------|----------------|---------------|--------|

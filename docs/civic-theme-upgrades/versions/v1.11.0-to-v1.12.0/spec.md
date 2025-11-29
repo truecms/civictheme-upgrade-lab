@@ -30,6 +30,12 @@ project-specific customisations require it.
 - Standard organisational safeguards apply:
   - Backups and/or database snapshots exist prior to running the upgrade.
   - Deployments are reviewed via merge requests or equivalent.
+- **Existing `.gitignore` files MUST NOT be modified.** The assumption is that
+  the theme is already operational and its ignored files and folders (such as
+  `node_modules/`, `dist/`, vendor directories, and build artefacts) are
+  correctly configured. Modifying `.gitignore` can disrupt the existing build
+  pipeline, accidentally commit generated files, or break local development
+  environments.
 - This spec focuses on the **CivicTheme 1.11.0 → 1.12.0** step only. Any
   earlier or later version jumps MUST be documented in separate directories.
 
