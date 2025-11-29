@@ -3,7 +3,7 @@
 **Directory**: `docs/civic-theme-upgrades/versions/v1.10.0-to-v1.11.0/`  
 **Related documents**: `spec.md` (what/why), `tasks.md` (checklist), `playbook.md` (how)
 
-This file is an optional planning scratchpad for humans and AI coding
+This file is an optional planning scratchpad for developers and AI coding
 assistants. It is intended to capture early thoughts and prompts **before**
 or while refining `spec.md`, `tasks.md` and `playbook.md`. The canonical
 source of truth for this upgrade remains the spec/tasks/playbook trio.

@@ -7,7 +7,7 @@
 
 This document defines the canonical per-version specification for the
 CivicTheme `1.10.0 → 1.11.0` upgrade, using the framework defined in
-`specs/001-rely-contents-docs/spec.md`. Destination projects SHOULD use
+`docs/civic-theme-upgrades/planning.md`. Destination projects SHOULD use
 this spec (and its companion `tasks.md` and `playbook.md`) as the primary
 instructions for performing this upgrade, adapting only where
 project-specific customisations require it.
@@ -557,9 +557,9 @@ When assisting with this upgrade, AI models SHOULD:
 
 ---
 
-## 8. Human review checklist
+## 8. Developer review checklist
 
-Before considering the 1.10.0 → 1.11.0 upgrade complete, a human reviewer
+Before considering the 1.10.0 → 1.11.0 upgrade complete, a developer
 SHOULD confirm:
 
 - [ ] The customisation register has been refreshed and all known

@@ -19,13 +19,13 @@ Auto-generated from all feature plans. Last updated: 2025-11-29
 docs/
   civic-theme-upgrades/
     customisations.md        # Canonical customisation register (template)
+    planning.md              # Global upgrade documentation framework
     README.md                # Entry point for upgrade documentation
     versions/
       vX.Y.Z-to-vA.B.C/      # Per-version upgrade directories
         spec.md              # What & why (planning, analysis)
         tasks.md             # Checklist of work
         playbook.md          # How (ordered runbook)
-  planning.md                # Global upgrade documentation framework
 specs/
   NNN-feature-name/          # Feature specifications (internal planning)
 ```
@@ -39,7 +39,7 @@ specs/
 
 ## CivicTheme Upgrade Assistant Framework
 
-- This repository defines a **documentation-first CivicTheme upgrade assistant** used by both humans and AI coding assistants.
+- This repository defines a **documentation-first CivicTheme upgrade assistant** used by both developers and AI coding assistants.
 - Destination projects MUST keep a canonical customisation register at
   `docs/civic-theme-upgrades/customisations.md`.
 - Each CivicTheme version step MUST live under
