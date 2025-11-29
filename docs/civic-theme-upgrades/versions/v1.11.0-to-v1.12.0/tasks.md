@@ -32,8 +32,7 @@ accordingly.
     grep -A 10 "^\s*fe:" .ahoy.yml  # Check what 'fe' command does
     ```
     Common patterns: `ahoy fe`, `ahoy build`, `ahoy storybook`.
-  - **Key**: `ahoy fe` as a standalone command typically runs the complete
-    front-end build (npm install + npm run build).
+  - **Key**: `ahoy fe` is equivalent to `npm run build` from the theme directory, but can be invoked from the project root.
   - Document discovered commands in the planning notes.
 
 - [ ] T200b [P] Discover available test commands
@@ -317,7 +316,7 @@ accordingly.
 
 - [ ] T221 Rebuild sub-theme assets
   - Run front-end build using discovered command from T200a:
-    - **Recommended**: `ahoy fe` (standalone - does npm install + build).
+    - **Recommended**: `ahoy fe` (equivalent to `npm run build` from theme directory).
     - Or native: `npm run build` or `npm run dist`.
   - Verify build completes without errors.
   - Check that output files are generated correctly.
@@ -404,7 +403,7 @@ accordingly.
 - [ ] T238 Test sub-theme build
   - Run front-end build using discovered command from T200a.
   - Verify build completes without errors.
-  - Test Storybook (if used): `ahoy fe npm run storybook`.
+  - Test Storybook (if used): Use appropriate Storybook command (e.g., `ahoy storybook` if available).
 
 - [ ] T239 [P] Run tests after upgrade (regression check)
   - Execute the same test commands discovered in T200b.

@@ -104,28 +104,20 @@ if [ -f ".ahoy.yml" ]; then
 fi
 
 # Common front-end command patterns to look for:
-# - ahoy fe               (Full front-end build - install + compile)
-# - ahoy fe npm install   (Run specific npm command via ahoy)
-# - ahoy fe npm run build (Run specific build via ahoy)
-# - ahoy build            (Direct build command)
-# - ahoy storybook        (Start Storybook)
+# - ahoy fe               (Front-end build - equivalent to npm run build from theme directory)
+# - ahoy build            (Direct build command, if available)
+# - ahoy storybook        (Start Storybook, if available)
 ```
 
 **Document discovered front-end commands**:
 
 | Command | Description | Usage |
 |---------|-------------|-------|
-| `ahoy fe` | Full front-end build (standalone) | Runs npm install + build automatically |
-| `ahoy fe <cmd>` | Run specific npm command | `ahoy fe npm run storybook` |
+| `ahoy fe` | Front-end build (equivalent to `npm run build` from theme directory) | Can be invoked from project root |
 | `ahoy build` | Direct build | If available |
 | `ahoy storybook` | Storybook | If available |
 
-**Key insight**: `ahoy fe` as a standalone command (without arguments)
-typically performs the complete front-end build process including
-`npm install` and `npm run build`. Use this as the primary command for
-rebuilding front-end assets.
-
-For specific npm commands, pass them as arguments: `ahoy fe npm run storybook`.
+**Key insight**: `ahoy fe` is equivalent to running `npm run build` from the theme directory, but can be invoked from the project root. Use this as the primary command for rebuilding front-end assets.
 
 ### 1.8 Discover available test commands
 
@@ -498,13 +490,8 @@ This enables validation of component props against schemas.
 ### 3.9 Rebuild sub-theme assets
 
 ```bash
-# RECOMMENDED: Using ahoy fe (standalone - does everything)
-# This runs npm install + npm run build automatically
+# RECOMMENDED: Using ahoy fe (equivalent to npm run build from theme directory)
 ahoy fe
-
-# Alternative: Using ahoy fe with specific commands
-ahoy fe npm install
-ahoy fe npm run build
 
 # Alternative: Native (non-Docker environments)
 cd $SUBTHEME_PATH
@@ -618,10 +605,7 @@ Open the site in a browser and manually check:
 
 ```bash
 # Start Storybook
-# RECOMMENDED: Using ahoy fe with storybook command
-ahoy fe npm run storybook
-
-# Or using dedicated ahoy storybook (if available):
+# RECOMMENDED: Using dedicated ahoy storybook (if available)
 ahoy storybook
 
 # Alternative: Native (non-Docker environments)

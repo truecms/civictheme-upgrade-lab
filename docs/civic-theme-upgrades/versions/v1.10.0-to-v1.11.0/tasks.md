@@ -30,9 +30,7 @@ They are intended to be adapted per project; IDs here are examples.
     grep -A 10 "^\s*fe:" .ahoy.yml  # Check what 'fe' command does
     ```
     Common patterns: `ahoy fe`, `ahoy build`, `ahoy storybook`.
-  - **Key**: `ahoy fe` as a standalone command (no arguments) typically
-    runs the complete front-end build (npm install + npm run build).
-  - For specific npm commands, pass as arguments: `ahoy fe npm run storybook`.
+  - **Key**: `ahoy fe` is equivalent to `npm run build` from the theme directory, but can be invoked from the project root.
   - Document discovered commands in the planning notes.
 
 - [ ] T100b [P] Discover available test commands
@@ -273,8 +271,7 @@ They are intended to be adapted per project; IDs here are examples.
 
 - [ ] T125 Test sub-theme build
   - Run front-end build using discovered command from T100a:
-    - **Recommended**: `ahoy fe` (standalone - does npm install + build).
-    - Or specific: `ahoy fe npm run build`.
+    - **Recommended**: `ahoy fe` (equivalent to `npm run build` from theme directory).
     - Or native: `npm run build` or `npm run dist`.
     - Or docker: `docker compose exec cli bash -c "cd web/themes/custom/yourtheme && npm run build"`.
   - Verify build completes without errors.

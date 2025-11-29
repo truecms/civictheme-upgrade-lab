@@ -70,7 +70,7 @@ media was being stripped from WYSIWYG content.
 
 - [ ] T312 Rebuild sub-theme assets (optional)
   - Run front-end build using discovered command:
-    - **Recommended**: `ahoy fe` (standalone - does npm install + build).
+    - **Recommended**: `ahoy fe` (equivalent to `npm run build` from theme directory).
     - Or native: `npm run build` or `npm run dist`.
   - Verify build completes without errors.
   - This picks up the updated `@civictheme/sdc` 1.12.1 package.

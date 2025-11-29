@@ -105,8 +105,7 @@ fi
 
 | Command | Description | Usage |
 |---------|-------------|-------|
-| `ahoy fe` | Full front-end build (standalone) | Runs npm install + build automatically |
-| `ahoy fe <cmd>` | Run specific npm command | `ahoy fe npm run storybook` |
+| `ahoy fe` | Front-end build (equivalent to `npm run build` from theme directory) | Can be invoked from project root |
 
 ### 1.8 Discover available test commands
 
@@ -670,12 +669,8 @@ Security fixes are the priority.
 ### 3.12 Rebuild sub-theme assets (T221)
 
 ```bash
-# RECOMMENDED: Using ahoy fe (standalone - does everything)
+# RECOMMENDED: Using ahoy fe (equivalent to npm run build from theme directory)
 ahoy fe
-
-# Alternative: Using ahoy fe with specific commands
-ahoy fe npm install
-ahoy fe npm run build
 
 # Alternative: Native (non-Docker environments)
 cd $SUBTHEME_PATH
