@@ -1,0 +1,10 @@
+# Git ignore for CivicTheme upgrade assistant repo
+
+# Universal
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+.idea/
+.vscode/
+

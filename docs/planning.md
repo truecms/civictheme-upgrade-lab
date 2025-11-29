@@ -26,27 +26,46 @@ This framework is designed for:
 
 ## 3. Repository structure for documentation
 
-Recommended directory layout for documentation in the project repository:
+Recommended directory layout for CivicTheme upgrade documentation in a
+destination project:
 
 ```text
 docs/
   civic-theme-upgrades/
     framework/
-      civic-theme-upgrade-framework.md      # This file (global framework, not version specific)
+      civic-theme-upgrade-framework.md      # Global framework, not version specific
     versions/
       vX.Y.Z-to-vA.B.C/                     # Example: v1.5.0-to-v1.6.0
-        spec.md                             # Per version upgrade specification
+        spec.md                             # Per-version upgrade specification (planning & analysis)
+        tasks.md                            # Per-version task list derived from the spec
+        playbook.md                         # Per-version upgrade execution / runbook
       vA.B.C-to-vD.E.F/
         spec.md
+        tasks.md
+        playbook.md
+```
 
 Notes:
-	•	civic-theme-upgrade-framework.md is the global framework that you are reading now.
-	•	Each real upgrade will live in its own directory under versions/, for example:
-	•	docs/civic-theme-upgrades/versions/v1.5.0-to-v1.6.0/spec.md
-	•	docs/civic-theme-upgrades/versions/v1.9.0-to-v1.10.0/spec.md
-	•	The directory name must clearly show the source and target CivicTheme versions.
+- `civic-theme-upgrade-framework.md` is the global framework that you are
+  reading now.
+- Each destination project MUST maintain a persistent "CivicTheme customisation
+  register" at the canonical path `docs/civic-theme-upgrades/customisations.md`
+  so that both humans and AI coding assistants can reliably find it.
+- Each real upgrade lives in its own directory under `versions/`, for example:
+  - `docs/civic-theme-upgrades/versions/v1.5.0-to-v1.6.0/spec.md`
+  - `docs/civic-theme-upgrades/versions/v1.9.0-to-v1.10.0/spec.md`
+- For each version range directory:
+  - `spec.md` captures planning, analysis, upstream references, project
+    context and customisation inventory view.
+  - `tasks.md` breaks the planned work into concrete tasks that reference
+    the spec, customisation register and inventory IDs.
+  - `playbook.md` is the executable runbook that turns the plan and tasks
+    into ordered steps, commands and checks for performing the upgrade.
+- Directory names MUST clearly show the source and target CivicTheme versions.
 
-You may adjust directory names if your organisation has its own naming conventions, but keep them consistent so both AI and humans can navigate reliably.
+You may adjust directory names if your organisation has its own naming
+conventions, but keep them consistent so both AI and humans can navigate
+reliably.
 
 4. Global link registry
 
@@ -303,68 +322,110 @@ These tasks are deliberately generic and should be referenced by future specs an
 
 8. Human developer checklist template
 
-Each per version spec should end with a short checklist for human developers. This checklist is about reviewing the plan and results, not performing the upgrade directly.
+Each per version spec should end with a short checklist for human developers.
+This checklist is about reviewing the plan and results in `spec.md` and
+`tasks.md`, not performing the upgrade directly.
 
 ## 8. Human checklist
 
-Before starting work:
+Before starting work (planning phase, focusing on `spec.md`):
 
 - [ ] Confirm `<CURRENT_VERSION>` and `<TARGET_VERSION>` values are correct.
 - [ ] Confirm all relevant upstream links in section 3 are present and accessible.
 - [ ] Review the customisation inventory in section 5 and add any missing items.
 
-After planning with AI:
+After planning with AI (still within `spec.md` and `tasks.md`):
 
 - [ ] Review AI generated analysis of impacts and adjust where necessary.
 - [ ] Confirm that high risk customisations are flagged for manual testing or refactoring.
 - [ ] Ensure any proposed structural changes to the sub-theme follow project conventions.
+- [ ] Ensure `tasks.md` accurately reflects the agreed plan and references
+      relevant customisation IDs and upstream changes.
 
-After the actual upgrade is implemented (outside of this document):
+After the actual upgrade is implemented (following `playbook.md`):
 
-- [ ] Confirm that all checklist items in the separate "upgrade execution" document are complete.
-- [ ] Update the customisation inventory if any customisations were removed or replaced.
-- [ ] Record any lessons learned that should influence future specs.
+- [ ] Confirm that all checklist items and steps in `playbook.md` are complete.
+- [ ] Update the customisation inventory and register if any customisations were
+      removed, replaced or added during the upgrade.
+- [ ] Record any lessons learned in `playbook.md` or a follow-up section so
+      that future specs and playbooks can be improved.
 
-9. How to create a new per version spec
+9. How to create a new per version spec, tasks and playbook
 
 When a new CivicTheme version is released and you decide to plan an upgrade:
-	1.	Create a new directory under docs/civic-theme-upgrades/versions/, for example:
 
+1. Create a new directory under `docs/civic-theme-upgrades/versions/`, for example:
+
+```text
 docs/
   civic-theme-upgrades/
     versions/
       v1.9.0-to-v1.10.0/
         spec.md
+        tasks.md
+        playbook.md
+```
 
+2. Copy the template from section 6 of this framework into `spec.md`.
 
-	2.	Copy the template from section 6 of this framework into spec.md.
-	3.	Replace placeholders:
-	•	<PROJECT_NAME>
-	•	<CURRENT_VERSION>
-	•	<TARGET_VERSION>
-	•	Any placeholder URLs and paths.
-	4.	Fill in:
-	•	Upstream links for the specific versions.
-	•	Initial high level change summary from official release notes.
-	•	Initial customisation inventory if known.
-	5.	Use the AI task lists (section 7) as prompts to:
-	•	Enrich the customisation inventory.
-	•	Analyse the impact of changes.
-	•	Propose a plan for the future upgrade execution document.
-	6.	Once the spec is stable, treat it as the input document for the later, separate “upgrade execution” documentation or run book.
+3. Replace placeholders:
+   - `<PROJECT_NAME>`
+   - `<CURRENT_VERSION>`
+   - `<TARGET_VERSION>`
+   - Any placeholder URLs and paths.
+
+4. Fill in `spec.md`:
+   - Upstream links for the specific versions.
+   - Initial high level change summary from official release notes.
+   - Initial customisation inventory if known, referencing the project’s
+     persistent customisation register.
+
+5. Use the AI task lists (section 7) as prompts to:
+   - Enrich the customisation inventory.
+   - Analyse the impact of changes.
+   - Propose a plan for the upgrade in terms of discrete tasks.
+
+6. Create `tasks.md`:
+   - Translate the agreed plan from `spec.md` into a list of tasks grouped by
+     theme (discovery, changes, validation) or customisation IDs.
+   - Make tasks specific enough that an AI coding assistant or human can act
+     on them without re-deriving the plan.
+
+7. Create `playbook.md` (upgrade execution document) once the plan is stable:
+   - Turn tasks from `tasks.md` into ordered steps, including commands,
+     configuration changes and checks.
+   - Make clear environment assumptions (non-production) and any preconditions.
+
+8. Once `spec.md`, `tasks.md` and `playbook.md` are stable, treat them as the
+   input documents for actual upgrade work and future audits.
 
 10. Separation of concerns
 
 It is important to keep the following separation clear:
-	•	This framework
-	•	Global patterns and templates for documentation.
-	•	No specific CivicTheme version logic.
-	•	Per version spec (for example v1.9.0-to-v1.10.0/spec.md)
-	•	Planning and analysis for a specific upgrade path.
-	•	Still not the place where actual upgrade commands are executed.
-	•	Upgrade execution documentation (to be created later)
-	•	Concrete step by step instructions, commands and checks for performing the actual upgrade.
-	•	May be generated or heavily assisted by AI using the per version spec as context.
 
-By following this framework, you can incrementally build a library of well structured CivicTheme upgrade specifications that support both AI coding assistants and human developers without mixing planning and execution in the same document.
+- **This framework**
+  - Global patterns and templates for documentation.
+  - No specific CivicTheme version logic.
 
+- **Per version spec (`spec.md`, for example `v1.9.0-to-v1.10.0/spec.md`)**
+  - Planning and analysis for a specific upgrade path.
+  - Upstream references, project context, customisation inventory view and
+    version analysis.
+  - Still not the place where actual upgrade commands are executed.
+
+- **Per version task list (`tasks.md`)**
+  - Structured tasks derived from `spec.md`.
+  - References to customisation register entries and inventory IDs.
+  - A bridge between planning and execution that remains descriptive rather
+    than a shell script.
+
+- **Upgrade execution documentation (`playbook.md`)**
+  - Concrete step by step instructions, commands and checks for performing the
+    actual upgrade.
+  - May be generated or heavily assisted by AI using `spec.md` and `tasks.md`
+    as context.
+
+By following this framework, you can incrementally build a library of well
+structured CivicTheme upgrade specifications, task lists and playbooks that
+support both AI coding assistants and human developers without mixing planning
+and execution in the same document.
