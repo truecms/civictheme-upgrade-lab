@@ -2,6 +2,18 @@
 
 **Status: Experimental** – this repository houses a documentation‑first, planning‑first framework to help humans and AI assistants plan and execute CivicTheme upgrades in Drupal projects. It is not a plug‑and‑play module; it is a set of conventions, specs, checklists, and runbooks that still require careful human review.
 
+## Disclaimer
+
+This upgrade assistant framework is provided as a standalone utility and is **not** part of, nor officially supported by, the CivicTheme Drupal project or any CivicTheme maintainers. It is intended to assist with planning and executing common upgrade tasks but is provided “as is” without any warranties or guarantees of any kind, either expressed or implied.
+
+Use this framework at your own risk:
+
+- Always review suggested steps, diffs and commands before running them.
+- Always use version control and backups before making changes to your projects.
+- Always run upgrades in non‑production environments first.
+
+Nothing in this repository should be interpreted as official CivicTheme guidance; when in doubt, defer to the upstream CivicTheme documentation and release notes.
+
 ## What this framework provides
 
 - A canonical folder for upgrade documentation at `docs/civic-theme-upgrades/`.
@@ -98,4 +110,3 @@ Because this framework is experimental, feedback is especially welcome:
 - If you successfully use this framework in a real project, consider sharing your experience so the guidance and examples can be refined.
 
 Together we can evolve this into a more robust and reliable assistant for CivicTheme upgrades, while keeping human judgment at the center of every change.
-

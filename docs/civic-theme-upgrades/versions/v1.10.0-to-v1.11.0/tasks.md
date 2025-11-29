@@ -65,10 +65,27 @@ They are intended to be adapted per project; IDs here are examples.
     component directories:
     - Ensure directory structures and annotations are compatible with
       CivicTheme 1.11.0 expectations and Drupal’s SDC system.
-    - Where appropriate, use the CivicTheme SDC update tooling (from the
-      CivicTheme upgrade-tools repository) to help generate or update
-      `.component.yml` files and per-component `.css`, reviewing all
-      generated changes before commit.
+    - Where appropriate, use the CivicTheme SDC Update Tool (the
+      `sdc-update` tool from the CivicTheme `upgrade-tools` repository)
+      to help generate or update SDC metadata:
+      - Confirm prerequisites:
+        - Sub-theme is already on CivicTheme 1.10.x.
+        - Node.js 22+ is available.
+        - An Anthropic API key is available for the tool.
+      - In a **separate working copy or feature branch**:
+        - Clone `https://github.com/civictheme/upgrade-tools`.
+        - Run `npm install` in the cloned repository.
+        - Create/update `.env` with:
+          - The absolute path to the CivicTheme sub-theme directory.
+          - The Anthropic API key (and optional model override).
+        - Run `npm run update-components` and follow the interactive
+          prompts.
+      - After the tool completes:
+        - Inspect the `.logs/` directory in the tool repo for errors
+          or unexpected changes.
+        - Review and curate the resulting changes in the sub-theme
+          (updated component directories, `.component.yml` files,
+          generated schemas and CSS) before committing anything.
 
 - [ ] T113 Align SCSS and JS with updated markup
   - For custom SCSS/JS tied to CivicTheme components:

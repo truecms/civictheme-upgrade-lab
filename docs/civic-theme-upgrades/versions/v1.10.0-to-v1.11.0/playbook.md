@@ -75,12 +75,29 @@ Related tasks: T100, T120
    - For custom components or SDC usage:
      - Ensure directories, annotations and naming conventions conform to
        CivicTheme 1.11.0 expectations and Drupal’s SDC rules.
-     - Where appropriate, run the CivicTheme SDC update tooling
-       (from the CivicTheme upgrade-tools repository) against the
-       project’s custom components:
-       - Configure it to target the relevant theme(s) only.
-       - Review all generated `.component.yml` and `.css` files
-         carefully before committing.
+   - If you choose to use the CivicTheme SDC Update Tool (`sdc-update`):
+     - Treat this as an **optional but invasive** helper – run it only
+       in a feature branch or disposable working copy.
+     - Check prerequisites:
+       - Sub-theme is already on CivicTheme 1.10.x.
+       - Node.js 22+ is installed and active.
+       - You have an Anthropic API key available.
+     - In a separate directory (outside the Drupal project if desired):
+       - Clone the `civictheme/upgrade-tools` repository.
+       - Change into the cloned directory and run `npm install`.
+       - Create or edit `.env` in that directory to include:
+         - The absolute path to the CivicTheme sub-theme you want to
+           update.
+         - The Anthropic API key (and model override if needed).
+       - Run `npm run update-components` and follow the interactive
+         prompts to update Storybook config, theme files and components.
+     - After the script finishes:
+       - Review the `.logs/` directory for errors or partial failures.
+       - Use Git diff to inspect all changes applied to the sub-theme
+         (component directories, `.component.yml`, schemas, CSS, build
+         tooling).
+       - Re-run the Drupal site and Storybook build to confirm SDC
+         components render and behave as expected before committing.
 4. **Align SCSS/JS with updated markup (T113)**
    - Inspect custom SCSS and JS tied to CivicTheme components.
    - Update selectors or logic if upstream markup or class names changed.

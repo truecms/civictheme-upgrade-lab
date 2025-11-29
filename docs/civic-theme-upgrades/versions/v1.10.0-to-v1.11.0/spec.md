@@ -55,9 +55,20 @@ preparing and validating this upgrade:
 - **Single Directory Components (SDC) guidance** for CivicTheme and
   Drupal core 10.2+/10.3+ (see relevant sections under
   `https://docs.civictheme.io`).
-- **CivicTheme Upgrade Tools – SDC update script** (for optional
-  automated conversion of components to SDC) – see the `sdc-update`
-  tooling in the CivicTheme upgrade-tools repository and its README.
+- **CivicTheme Upgrade Tools – SDC update script** (for optional,
+  automated assistance converting sub-theme components to SDC):
+  - Repository: `https://github.com/civictheme/upgrade-tools`
+  - Tool: `sdc-update` (CivicTheme SDC Update Tool).
+  - High-level usage (see its README for full details):
+    - Requires Node.js 22+, a CivicTheme sub-theme already updated to
+      CivicTheme 1.10.x, and an Anthropic API key.
+    - Run in a throwaway working copy or feature branch only (it
+      updates `package.json`, Storybook config, `build.js` and
+      component directories).
+    - Typical flow: clone the repo, run `npm install`, configure a
+      `.env` file (sub-theme path, Anthropic API key, optional model)
+      and execute `npm run update-components`, then review changes and
+      `.logs/` output.
 - **Upstream code diff** (1.10.0 → 1.11.0):  
   `https://git.drupalcode.org/project/civictheme/-/compare/1.10.0...1.11.0?from_project_id=86817`
 
@@ -198,8 +209,15 @@ The intended strategy for this upgrade is:
    - Update sub-theme libraries and build scripts where they reference
      old global asset file names (`dist/civictheme.css`,
      `dist/civictheme.js`) so they align with the new split bundles.
-   - Evaluate and, where appropriate, run the SDC update tooling against
-     custom components, reviewing all generated changes before commit.
+   - Evaluate and, where appropriate, run the CivicTheme SDC Update Tool
+     against custom components in the sub-theme:
+     - Treat this as an **optional, high-impact helper** – always run
+       it in a feature branch or isolated working copy.
+     - Ensure the sub-theme meets the tool’s prerequisites (CivicTheme
+       1.10.x, Node.js 22+, Anthropic API key configured via `.env`).
+     - Use the tool to generate or update SDC schemas and
+       `.component.yml`/component `.css` files, then manually review the
+       diff, logs and resulting site/Storybook output before commit.
    - Adjust configuration where component APIs or behaviour changed (for
      example automated lists, alerts, table-of-contents, navigation).
 3. **Validation**
