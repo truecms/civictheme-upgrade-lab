@@ -557,9 +557,9 @@ When assisting with this upgrade, AI models SHOULD:
 
 ---
 
-## 8. Human review checklist
+## 8. Developer review checklist
 
-Before considering the 1.10.0 → 1.11.0 upgrade complete, a human reviewer
+Before considering the 1.10.0 → 1.11.0 upgrade complete, a developer
 SHOULD confirm:
 
 - [ ] The customisation register has been refreshed and all known

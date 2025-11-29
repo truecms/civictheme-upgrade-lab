@@ -3,7 +3,7 @@
 **Directory**: `docs/civic-theme-upgrades/versions/v1.11.0-to-v1.12.0/`  
 **Related documents**: `spec.md` (what/why), `tasks.md` (checklist), `playbook.md` (how)
 
-This file is an optional planning scratchpad for humans and AI coding
+This file is an optional planning scratchpad for developers and AI coding
 assistants. It is intended to capture early thoughts and prompts **before**
 or while refining `spec.md`, `tasks.md` and `playbook.md`. The canonical
 source of truth for this upgrade remains the spec/tasks/playbook trio.
@@ -27,6 +27,29 @@ vulnerabilities.
 **Urgency**: All sites on CivicTheme 1.11.0 or earlier should upgrade to
 1.12.0 to remediate security risks. Sub-themes may also carry these risks
 if they override affected components.
+
+#### Key security changes in 1.12.0
+
+1. **Twig template XSS fixes**:
+   - `heading.twig`: Removed `|raw` from `{{ content }}`
+   - `button.twig`: Removed `|raw` from `{{ text }}`
+
+2. **CivicTheme API updates for access control**:
+   - `civictheme_get_field_referenced_entities()` now requires `$build` arg
+   - `civictheme_get_field_referenced_entity()` now requires `$build` arg
+   - `civictheme_get_field_value()` now requires `build:` named parameter
+   - These functions now check entity access and manage cache metadata
+
+3. **XSS filtering in preprocess**:
+   - Title resolver results filtered with `Xss::filter()` + `strip_tags()`
+   - Link text from `getText()` filtered with `Xss::filter()`
+   - Menu item titles filtered with `Xss::filter()`
+
+4. **iframe paragraph security**:
+   - `field_c_p_attributes` removed to prevent attribute injection
+
+5. **Permission updates**:
+   - Content Author/Approver should not edit Icons media type (SVG XSS risk)
 
 ### New features
 
@@ -150,23 +173,35 @@ the playbook.)*
 
 ## 4. Estimation notes
 
-Based on upstream complexity (much simpler than 1.10.0 → 1.11.0):
+Based on upstream complexity and security review requirements:
 
 | Phase | Estimated Effort |
 |-------|------------------|
-| Discovery (audit) | 0.5-1 hour |
-| Security review | 1-2 hours (depends on override count) |
-| Composer update | 0.25 hours |
+| Discovery (audit Twig + preprocess) | 1-2 hours |
+| Remove `\|raw` from Twig templates | 0.5-1 hour |
+| Update CivicTheme API calls ($variables) | 1-2 hours |
+| Add XSS filtering to preprocess | 1-2 hours |
+| Composer update + config changes | 0.5 hours |
 | Menu/attachment updates | 0.5-1 hour (if applicable) |
+| XSS testing | 1-2 hours |
 | Validation | 1-2 hours |
 | Documentation | 0.5-1 hour |
-| **Total** | **3.75-7.25 hours** |
+| **Total** | **7-13 hours** |
 
-*(Adjust based on number of sub-theme overrides requiring security review.)*
+*(Adjust based on number of sub-theme overrides and preprocess functions.)*
+
+**Key factors affecting effort**:
+
+- Number of Twig template overrides using `|raw` filter
+- Number of preprocess functions calling CivicTheme API
+- Number of preprocess functions outputting titles/labels
+- Presence of custom menu preprocessing
+- Whether iframe paragraph attributes field is used
 
 **Comparison with 1.10.0 → 1.11.0**: That upgrade was estimated at
-9-22 hours due to the SDC migration. This upgrade should be significantly
-faster.
+9-22 hours due to the SDC migration. This upgrade is similar in scope
+due to the security review requirements, but more focused on specific
+patterns rather than wholesale architecture changes.
 
 ---
 
@@ -186,15 +221,28 @@ Record key decisions made during planning:
 
 | Aspect | 1.10.0 → 1.11.0 | 1.11.0 → 1.12.0 |
 |--------|-----------------|-----------------|
-| Primary focus | SDC migration (architectural) | Security fixes |
-| Breaking changes | Yes (major) | No |
-| Twig syntax changes | Yes (all includes) | No |
+| Primary focus | SDC migration (architectural) | Security fixes (XSS + info disclosure) |
+| Breaking changes | Yes (major) | No (but API deprecations) |
+| Twig syntax changes | Yes (all includes) | Yes (remove `\|raw` from overrides) |
 | Block name changes | Yes (_slot → _block) | No |
 | Asset file changes | Yes (CSS/JS split) | No |
 | Build tooling changes | Yes (significant) | No |
-| Sub-theme template updates | Required for all | Only if security-relevant |
-| Estimated effort | 9-22 hours | 3.75-7.25 hours |
-| Urgency | Medium (feature release) | High (security release) |
+| API changes | No | Yes (functions require $build arg) |
+| Preprocess changes | No | Yes (XSS filtering required) |
+| Sub-theme template updates | Required for all | Only if using `\|raw` on user data |
+| Sub-theme preprocess updates | No | Yes (API calls + XSS filtering) |
+| Estimated effort | 9-22 hours | 7-13 hours |
+| Urgency | Medium (feature release) | **High (security release)** |
+
+### Key differences in upgrade approach
+
+| 1.10.0 → 1.11.0 | 1.11.0 → 1.12.0 |
+|-----------------|-----------------|
+| Focus on Twig include syntax | Focus on security patterns |
+| Replace all `@atoms/...` includes | Audit and remove `\|raw` filter |
+| Refactor extended templates | Update CivicTheme API calls |
+| Update library overrides | Add XSS filtering to preprocess |
+| Update build tooling | Run XSS tests |
 
 ---
 

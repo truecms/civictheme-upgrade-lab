@@ -1,6 +1,6 @@
 # CivicTheme Upgrade Assistant
 
-**Status: Experimental** – this repository houses a documentation‑first, planning‑first framework to help humans and AI assistants plan and execute CivicTheme upgrades in Drupal projects. It is not a plug‑and‑play module; it is a set of conventions, specs, checklists, and runbooks that still require careful human review.
+**Status: Experimental** – this repository houses a documentation‑first, planning‑first framework to help developers and AI assistants plan and execute CivicTheme upgrades in Drupal projects. It is not a plug‑and‑play module; it is a set of conventions, specs, checklists, and runbooks that still require careful developer review.
 
 ## Disclaimer
 
@@ -63,7 +63,7 @@ This is the simplest way to “vendor” the documentation into an existing repo
    - `tools/civictheme-upgrade-assistant/docs/civic-theme-upgrades/`
    - `tools/civictheme-upgrade-assistant/.specify/` and `specs/` (internal to the framework).
 3. Decide how you want to expose the upgrade docs:
-   - Either **reference them in place** (for example, point humans and AI assistants at `tools/civictheme-upgrade-assistant/docs/civic-theme-upgrades/`), or
+   - Either **reference them in place** (for example, point developers and AI assistants at `tools/civictheme-upgrade-assistant/docs/civic-theme-upgrades/`), or
    - Copy or symlink `tools/civictheme-upgrade-assistant/docs/civic-theme-upgrades/` into your main `docs/` directory so the canonical path in your project becomes `docs/civic-theme-upgrades/…`.
 
 Cloning keeps this framework as a separate Git history while still making all docs available in your project.
@@ -81,11 +81,15 @@ Once the `docs/civic-theme-upgrades/` folder is present in your project:
     - `playbook.md` (How/runbook),
     - optionally `planning.md` (scratchpad).
 - Treat `spec.md`, `tasks.md`, and `playbook.md` for a given version step as **one coherent unit of work**.
-- Use the playbook only in non‑production environments and always align it with your project’s deployment standards and governance.
+- Use the playbook only in non‑production environments and always align it with your project's deployment standards and governance.
 
 For more detailed guidance, see `docs/civic-theme-upgrades/README.md` inside this repo.
 
-## Human verification is required
+### Starting prompt for AI assistants
+
+If you are using an AI coding assistant (Cursor, Copilot, Claude, etc.), there is a ready‑to‑use starting prompt in [`docs/civic-theme-upgrades/README.md` § "Starting prompt for AI assistants"](docs/civic-theme-upgrades/README.md#4-starting-prompt-for-ai-assistants). Copy and paste it into your AI assistant to bootstrap the upgrade process.
+
+## Developer verification is required
 
 This framework is intentionally conservative and documentation‑driven:
 
@@ -95,9 +99,9 @@ This framework is intentionally conservative and documentation‑driven:
   - contrib modules,
   - custom modules and overrides,
   - infrastructure and deployment practices.
-- AI assistants using this framework must be treated as helpers, not authorities: humans remain accountable for verifying diffs, running tests, validating environments, and deciding what is safe to deploy.
+- AI assistants using this framework must be treated as helpers, not authorities: developers remain accountable for verifying diffs, running tests, validating environments, and deciding what is safe to deploy.
 
-If you are not comfortable treating this as an experimental tool that needs human oversight, you should not run any commands suggested by the playbooks.
+If you are not comfortable treating this as an experimental tool that needs developer oversight, you should not run any commands suggested by the playbooks.
 
 ## Feedback and contributions
 
@@ -107,4 +111,4 @@ Because this framework is experimental, feedback is especially welcome:
 - If you have concrete improvements (better specs, clearer tasks, safer playbooks, or additional version steps), please submit a pull request.
 - If you successfully use this framework in a real project, consider sharing your experience so the guidance and examples can be refined.
 
-Together we can evolve this into a more robust and reliable assistant for CivicTheme upgrades, while keeping human judgment at the center of every change.
+Together we can evolve this into a more robust and reliable assistant for CivicTheme upgrades, while keeping developer judgement at the centre of every change.

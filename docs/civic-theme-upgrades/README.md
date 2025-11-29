@@ -2,7 +2,7 @@
 
 This folder contains the **global entry point** for CivicTheme upgrade
 work in this repository. It is documentation-only and is intended to be
-used by both human maintainers and AI coding assistants.
+used by both developers and AI coding assistants.
 
 ## 1. Global starting point
 
@@ -84,13 +84,13 @@ For **all** such directories:
 
 - `playbook.md` – **How / Runbook**
   - Ordered, non-production execution steps implementing the tasks.
-  - Includes commands, checks and notes about where human review is
+  - Includes commands, checks and notes about where developer review is
     required.
   - Must assume a safe environment (feature branch, staging, etc.) and
     must remain consistent with `spec.md` and `tasks.md`.
 
 - `planning.md` (optional) – **Planning scratchpad**
-  - Free-form notes and prompts for humans and AI.
+  - Free-form notes and prompts for developers and AI.
   - Used before or while refining `spec.md`, `tasks.md` and
     `playbook.md`.
   - **Not** a source of truth: once decisions are made, they must be
@@ -139,7 +139,80 @@ this framework, AI coding assistants SHOULD follow these rules:
      - the global customisation register at
        `docs/civic-theme-upgrades/customisations.md`.
 
-By following this structure, both humans and AI can confidently answer
-“where do I start?” and “how should I treat these files?” for any
+By following this structure, both developers and AI can confidently answer
+"where do I start?" and "how should I treat these files?" for any
 CivicTheme upgrade step in this repository.
+
+---
+
+## 4. Starting prompt for AI assistants
+
+When you begin working with the CivicTheme Upgrade Assistant in a
+destination project, copy and paste the following prompt into your AI
+coding assistant (Cursor, Copilot, Claude, etc.) to bootstrap the process:
+
+---
+
+**Copy the prompt below** (everything between the triple backticks):
+
+```text
+I am working on a Drupal project that uses CivicTheme. This project has
+adopted the CivicTheme Upgrade Assistant framework for managing upgrades.
+
+Please help me plan and execute a CivicTheme upgrade by following these
+steps:
+
+1. **Orientation**: Read the following files to understand the framework:
+   - `docs/civic-theme-upgrades/README.md` (entry point)
+   - `docs/civic-theme-upgrades/planning.md` (global framework)
+   - `docs/civic-theme-upgrades/customisations.md` (customisation register)
+
+2. **Discovery**: Identify the project's current state:
+   - Locate the CivicTheme installation (usually `web/themes/contrib/civictheme/`).
+   - Identify the sub-theme (usually under `web/themes/custom/`).
+   - Determine the current CivicTheme version from `composer.lock` or
+     `civictheme.info.yml`.
+   - Scan for CivicTheme customisations (Twig overrides, SCSS/CSS, JS,
+     configuration).
+
+3. **Customisation register**: Update `docs/civic-theme-upgrades/customisations.md`:
+   - If it is a template, populate it with the discovered customisations.
+   - If it already exists, verify it is current and add any missing items.
+   - Assign stable IDs (C1, C2, etc.) to each customisation.
+
+4. **Target version**: Confirm the target CivicTheme version I want to
+   upgrade to. If I have not specified it, suggest the next incremental
+   release.
+
+5. **Per-version documentation**: Navigate to or create the appropriate
+   version directory under `docs/civic-theme-upgrades/versions/`:
+   - If the directory exists, read `spec.md`, `tasks.md` and `playbook.md`.
+   - If it does not exist, create it following the pattern
+     `v<CURRENT>-to-v<TARGET>/` and scaffold the spec/tasks/playbook trio.
+
+6. **Planning**: Work through the spec → tasks → playbook flow:
+   - Analyse upstream changes for the target version.
+   - Cross-reference with the customisation register to identify risks.
+   - Propose concrete tasks and execution steps.
+
+7. **Execution** (when I confirm): Follow the playbook steps in a safe
+   environment (feature branch, dev/staging), pausing for my review at
+   high-risk steps.
+
+Ask me any clarifying questions before proceeding. If you need information
+about the target CivicTheme version, I can provide release notes or you can
+search for them.
+```
+
+---
+
+### Tips for using this prompt
+
+- **Specify your target version** if you know it (for example, "I want to
+  upgrade from 1.11.0 to 1.12.0").
+- **Point to your sub-theme** if the AI cannot locate it automatically.
+- **Review AI-proposed changes** before accepting them – the framework is
+  designed to keep developers in control.
+- **Update the customisation register** after every upgrade so that future
+  upgrades start from accurate information.
 

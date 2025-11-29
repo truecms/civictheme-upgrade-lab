@@ -8,7 +8,7 @@ This document defines a reusable framework for writing CivicTheme upgrade specif
 - It is intended to be copied and adapted when you create **per version** upgrade specifications.
 - Any version numbers used in this framework (for example `1.5.0`, `1.9.0`, `1.12.1`) are **examples only**.
 - Real upgrade steps, commands and decisions will be written later in separate files that follow this framework.
-- It is a governance and planning document primarily for human maintainers;
+- It is a governance and planning document primarily for developers;
   AI coding assistants MUST NOT depend on this file existing at run time
   and SHOULD instead rely on per-version `spec.md` / `tasks.md` /
   `playbook.md` files and the feature specification
@@ -24,7 +24,7 @@ This framework is designed for:
   - Propose or generate upgrade steps.
   - Help reapply customisations on top of newer CivicTheme versions.
 
-- **Human developers** who will:
+- **Developers** who will:
   - Read and refine the specifications.
   - Decide which changes to apply.
   - Maintain the list of project-specific customisations.
@@ -55,7 +55,7 @@ Notes:
 - `docs/civic-theme-upgrades/planning.md` is the global framework that you are reading now.
 - Each destination project MUST maintain a persistent "CivicTheme customisation
   register" at the canonical path `docs/civic-theme-upgrades/customisations.md`
-  so that both humans and AI coding assistants can reliably find it.
+  so that both developers and AI coding assistants can reliably find it.
 - Each real upgrade lives in its own directory under `versions/`, for example:
   - `docs/civic-theme-upgrades/versions/v1.5.0-to-v1.6.0/spec.md`
   - `docs/civic-theme-upgrades/versions/v1.9.0-to-v1.10.0/spec.md`
@@ -72,7 +72,7 @@ Notes:
 - Directory names MUST clearly show the source and target CivicTheme versions.
 
 You may adjust directory names if your organisation has its own naming
-conventions, but keep them consistent so both AI and humans can navigate
+conventions, but keep them consistent so both AI and developers can navigate
 reliably.
 
 4. Global link registry
@@ -150,7 +150,7 @@ Example text to adapt:
 > - where to read upstream release notes and documentation  
 > - which customisations must be considered and preserved  
 > - what tasks an AI coding assistant should perform  
-> - what checks human developers should run to confirm the upgrade is successful
+> - what checks developers should run to confirm the upgrade is successful
 
 ## 3. Upstream references
 
@@ -201,13 +201,13 @@ This is a summary only. Detailed listing will appear later.
 	•	Custom JavaScript for CivicTheme components: <YES/NO, SHORT SUMMARY>
 	•	Custom configuration related to CivicTheme (views, blocks, layouts): <YES/NO, SHORT SUMMARY>
 
-If this is the first spec for a project, you may leave this as a placeholder and fill it once you have done an initial discovery pass with AI and humans.
+If this is the first spec for a project, you may leave this as a placeholder and fill it once you have done an initial discovery pass with AI and developers.
 
 5. Customisation inventory
 
-This section is central for AI and humans.
+This section is central for AI and developers.
 
-The goal is to maintain a machine readable and human readable list of all customisations that sit on top of CivicTheme and may be affected by upgrades.
+The goal is to maintain a machine-readable and developer-readable list of all customisations that sit on top of CivicTheme and may be affected by upgrades.
 
 5.1 Inventory table
 
@@ -226,7 +226,7 @@ Notes:
 
 5.2 Discovery prompts for AI
 
-These prompts are examples that a human can copy into an AI coding assistant. They are written as if the AI already has access to the repository.
+These prompts are examples that a developer can copy into an AI coding assistant. They are written as if the AI already has access to the repository.
 
 Prompt to identify custom Twig overrides:
 
@@ -316,7 +316,7 @@ You will reference or copy these tasks into future per version specs and adapt t
 2. Suggest an ordered list of changes to the sub-theme so that:
    - the base CivicTheme can be updated cleanly
    - customisations are reapplied or adjusted in a controlled way
-3. Mark any high risk items (for example, changes to structural templates) for explicit human review.
+3. Mark any high risk items (for example, changes to structural templates) for explicit developer review.
 
 7.3 Validation tasks
 
@@ -328,13 +328,13 @@ You will reference or copy these tasks into future per version specs and adapt t
 
 These tasks are deliberately generic and should be referenced by future specs and refined when real versions are known.
 
-8. Human developer checklist template
+8. Developer checklist template
 
-Each per version spec should end with a short checklist for human developers.
+Each per version spec should end with a short checklist for developers.
 This checklist is about reviewing the plan and results in `spec.md` and
 `tasks.md`, not performing the upgrade directly.
 
-## 8. Human checklist
+## 8. Developer checklist
 
 Before starting work (planning phase, focusing on `spec.md`):
 
@@ -396,7 +396,7 @@ docs/
 6. Create `tasks.md`:
    - Translate the agreed plan from `spec.md` into a list of tasks grouped by
      theme (discovery, changes, validation) or customisation IDs.
-   - Make tasks specific enough that an AI coding assistant or human can act
+   - Make tasks specific enough that an AI coding assistant or developer can act
      on them without re-deriving the plan.
 
 7. Create `playbook.md` (upgrade execution document) once the plan is stable:
@@ -444,6 +444,6 @@ In summary for each per-version directory:
 
 By following this framework, you can incrementally build a library of well
 structured CivicTheme upgrade specifications, task lists and playbooks that
-support both AI coding assistants and human developers without mixing planning
+support both AI coding assistants and developers without mixing planning
 and execution in the same document.
 

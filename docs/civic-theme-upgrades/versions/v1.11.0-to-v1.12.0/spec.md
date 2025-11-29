@@ -89,6 +89,90 @@ to assess risk.
 "Security update - 1.12.0" documentation at docs.civictheme.io for manual
 remediation steps.
 
+#### 3.1.1 Twig component XSS fixes
+
+CivicTheme 1.12.0 removes the `|raw` filter from content outputs in key
+components to prevent XSS attacks:
+
+**`heading.twig` change**:
+
+```diff
+- {{- content|raw -}}
++ {{- content -}}
+```
+
+**`button.twig` change**:
+
+```diff
+- {{- icon_markup -}}{{ text|raw }}
++ {{- icon_markup -}}{{ text }}
+```
+
+**Sub-theme impact**: If your sub-theme overrides `heading.twig` or
+`button.twig`, you MUST apply the same changes to remove `|raw` from
+user-entered content. If you relied on HTML being rendered in these
+fields, you will need additional work to implement safe rendering.
+
+#### 3.1.2 CivicTheme API changes for cacheability and access control
+
+CivicTheme 1.12.0 updates the field retrieval API to properly manage
+cacheable metadata and entity access control. The following functions
+now require a `$build` argument:
+
+| Function | Change |
+|----------|--------|
+| `civictheme_get_field_referenced_entities()` | New `$build` parameter (3rd argument) |
+| `civictheme_get_field_referenced_entity()` | New `$build` parameter (3rd argument) |
+| `civictheme_get_field_value()` | New `build:` named parameter |
+| `civictheme_get_referenced_entity_labels()` | New `$build` parameter (3rd argument) |
+
+**Deprecation warning**: Calling these functions without the `$build`
+argument triggers a deprecation notice in 1.12.0 and will be **required**
+in 1.13.0:
+
+```
+'Calling civictheme_get_field_referenced_entities without the $build
+argument is deprecated in civictheme:1.12.0. It will be required in
+civictheme:1.13.0.'
+```
+
+**Sub-theme impact**: Any sub-theme preprocess functions using these
+CivicTheme API functions MUST be updated to pass the `$variables` array.
+
+#### 3.1.3 Information disclosure fix
+
+CivicTheme 1.12.0 fixes information disclosure on entity reference fields
+by implementing proper access checking. The updated API functions now:
+
+- Check entity access before returning referenced entities.
+- Properly manage cacheability metadata for referenced entities.
+- Return only entities the current user has permission to view.
+
+**Sub-theme impact**: If your sub-theme accesses entity reference fields
+directly (not via CivicTheme API), you are responsible for implementing
+access checks. We strongly recommend using the CivicTheme API exclusively.
+
+#### 3.1.4 iframe paragraph security update
+
+The `field_c_p_attributes` field on the iframe paragraph has been removed
+to prevent XSS injection via attributes.
+
+**Required actions**:
+
+1. Check if any iframe paragraphs have values in the Attributes field.
+2. Remove `field.field.paragraph.civictheme_iframe.field_c_p_attributes`.
+3. Remove `field.storage.paragraph.field_c_p_attributes`.
+4. Update `civictheme_preprocess_paragraph__civictheme_iframe` to add any
+   required iframe attributes in preprocess instead.
+
+#### 3.1.5 Permission updates
+
+Content Author and Approver roles should no longer have permission to
+create/edit Icons media type (to prevent SVG-based XSS):
+
+- Remove permission: "create media" for Icons media type.
+- Remove permission: "edit any media" for Icons media type.
+
 ### 3.2 New features
 
 #### 3.2.1 Multi-line header
@@ -180,18 +264,124 @@ new CSS custom properties for improved flexibility.
 **Impact**: These are bug fixes that improve stability. Test any areas of
 your site that may have been affected by these issues.
 
-### 3.6 Summary of changes requiring sub-theme review
+### 3.6 Preprocess function updates required
+
+CivicTheme 1.12.0 updates several preprocess functions. Sub-themes with
+custom preprocess logic MUST apply equivalent changes.
+
+#### 3.6.1 Entity reference field access in preprocess
+
+All preprocess functions that retrieve entity reference fields must pass
+the `$variables` array to CivicTheme API functions:
+
+```php
+// BEFORE (deprecated)
+$items = civictheme_get_field_referenced_entities($paragraph, 'field_c_p_list_items');
+$featured_image = civictheme_get_field_value($block, 'field_c_b_featured_image', TRUE);
+$referenced_item = civictheme_get_field_referenced_entity($item, 'field_c_p_reference');
+
+// AFTER (required)
+$items = civictheme_get_field_referenced_entities($paragraph, 'field_c_p_list_items', $variables);
+$featured_image = civictheme_get_field_value($block, 'field_c_b_featured_image', TRUE, build: $variables);
+$referenced_item = civictheme_get_field_referenced_entity($item, 'field_c_p_reference', $variables);
+```
+
+#### 3.6.2 Manual list preprocess update
+
+`civictheme_preprocess_paragraph__civictheme_manual_list` now checks
+access to referenced entities before rendering. Without this check, empty
+columns appear if the user lacks access to a referenced entity:
+
+```php
+$items = civictheme_get_field_referenced_entities($paragraph, 'field_c_p_list_items', $variables);
+$builder = \Drupal::entityTypeManager()->getViewBuilder('paragraph');
+if ($items) {
+  foreach ($items as $item) {
+    if (!$item->hasField('field_c_p_reference')) {
+      $variables['rows'][] = $builder->view($item);
+      continue;
+    }
+    $referenced_item = civictheme_get_field_referenced_entity($item, 'field_c_p_reference', $variables);
+    if ($referenced_item instanceof EntityInterface) {
+      $variables['rows'][] = $builder->view($item);
+    }
+  }
+}
+```
+
+#### 3.6.3 Node title and entity label filtering
+
+Node titles and entity labels must be filtered to prevent XSS. CivicTheme
+updates `_civictheme_preprocess_block__civictheme_banner` and
+`_civictheme_preprocess_node__civictheme_page__full`:
+
+```php
+use Drupal\Component\Utility\Xss;
+
+$title = \Drupal::service('title_resolver')->getTitle(
+  \Drupal::request(),
+  \Drupal::routeMatch()->getRouteObject()
+);
+$title = (string) (is_array($title) ? reset($title) : ((string) $title));
+$title = Xss::filter($title);
+$title = strip_tags($title);
+$variables['title'] = $title;
+```
+
+**Sub-theme impact**: Any custom preprocess that outputs node titles or
+entity labels must apply `Xss::filter()` and `strip_tags()`.
+
+#### 3.6.4 Link text filtering
+
+Link fields with title enabled must filter the link title:
+
+```php
+use Drupal\Component\Utility\Xss;
+
+foreach ($breadcrumb->getLinks() as $link) {
+  $link_text = $link->getText();
+  $variables['breadcrumb']['links'][] = [
+    'text' => is_array($link_text) ? $link_text : Xss::filter((string) $link_text),
+    'url' => $link->getUrl()->toString(),
+  ];
+}
+```
+
+**Sub-theme impact**: Search for uses of `getText()` in your sub-theme
+and ensure link text is filtered.
+
+#### 3.6.5 Menu link title filtering
+
+`_civictheme_preprocess_menu_items` now filters menu link titles:
+
+```php
+use Drupal\Component\Utility\Xss;
+
+$item['title'] = isset($item['title']) ? Xss::filter($item['title']) : '';
+```
+
+**Sub-theme impact**: Any custom menu preprocessing must apply
+`Xss::filter()` to menu item titles.
+
+### 3.7 Summary of changes requiring sub-theme review
 
 Unlike the 1.10.0 → 1.11.0 upgrade (which required significant SDC
-migration work), the 1.11.0 → 1.12.0 upgrade is **primarily additive**.
-However, sub-themes SHOULD review:
+migration work), the 1.11.0 → 1.12.0 upgrade requires **security-focused
+sub-theme review**:
 
 | Area | Action Required |
 |------|-----------------|
-| Security patches | Verify sub-theme overrides don't reintroduce XSS/disclosure vulnerabilities |
-| Menu overrides | Review if sub-theme menu customisations need updating for enhanced theming |
-| CSS variables | Consider adopting new CSS custom properties if currently using SCSS variables |
-| Attachment overrides | Verify attachment component overrides handle file extension reset correctly |
+| `heading.twig` override | Remove `\|raw` filter from content output |
+| `button.twig` override | Remove `\|raw` filter from text output |
+| Entity reference fields | Update API calls to pass `$variables` argument |
+| Manual list preprocess | Add access check for referenced entities |
+| Title/label output | Apply `Xss::filter()` and `strip_tags()` |
+| Link text output | Apply `Xss::filter()` to `getText()` results |
+| Menu preprocessing | Apply `Xss::filter()` to menu item titles |
+| iframe paragraph | Remove attributes field, move to preprocess |
+| Permissions | Remove Icons media type edit permissions |
+| CSS variables | Consider adopting new CSS custom properties |
+| Attachment overrides | Verify file extension reset handling |
 
 ---
 
@@ -240,6 +430,27 @@ inventory, risk areas for this upgrade are categorised by severity.
   - **Sub-theme review**: After upgrading, audit any sub-theme overrides
     for components that handle user input or display user-generated
     content to ensure they don't reintroduce the patched vulnerabilities.
+
+- **Twig template `|raw` filter usage (CRITICAL)**:
+  - Sub-themes overriding `heading.twig` or `button.twig` MUST remove
+    the `|raw` filter from content/text outputs.
+  - **Action**: Search for `|raw` in all sub-theme Twig templates and
+    remove from user-entered data fields.
+
+- **CivicTheme API function updates (HIGH)**:
+  - All calls to `civictheme_get_field_referenced_entities()`,
+    `civictheme_get_field_referenced_entity()`, `civictheme_get_field_value()`,
+    and `civictheme_get_referenced_entity_labels()` must be updated to
+    pass the `$variables` (or `$build`) array.
+  - **Action**: Search sub-theme for these function calls and add the
+    required argument. Enable verbose error reporting to find missing
+    updates via deprecation warnings.
+
+- **Title and label XSS filtering (HIGH)**:
+  - Any custom preprocess outputting node titles, entity labels, link
+    text, or menu titles must apply `Xss::filter()`.
+  - **Action**: Audit all custom preprocess functions for unfiltered
+    title/label output.
 
 ### 5.2 MEDIUM RISK – Requires review and possible action
 
@@ -422,23 +633,83 @@ When assisting with this upgrade, AI models SHOULD:
 
 ---
 
-## 8. Human review checklist
+## 8. XSS testing instructions
 
-Before considering the 1.11.0 → 1.12.0 upgrade complete, a human reviewer
+After completing the upgrade, test for XSS vulnerabilities by attempting
+to inject script tags into user-editable fields. This validates that the
+security fixes are effective and that sub-theme customisations haven't
+reintroduced vulnerabilities.
+
+### 8.1 Test payload
+
+Use the following XSS test payload:
+
+```html
+<script>alert('☠️');</script>
+```
+
+### 8.2 Fields to test
+
+Enter the test payload in:
+
+1. **Text fields of CivicTheme components** – All component text/content
+   fields (paragraphs, blocks, etc.).
+2. **Title fields** – Node titles, taxonomy term names.
+3. **Link text fields** – Link field titles throughout the site.
+4. **Menu links** – Menu item titles in all menus.
+
+### 8.3 Expected result
+
+- The script tag should **NOT** execute (no alert dialog appears).
+- The content should either be escaped and displayed as text, or stripped
+  entirely.
+
+### 8.4 Automated testing
+
+If you have Behat with behat-steps available, adapt the XSS tests from
+CivicTheme to test your own components and custom components. See the
+CivicTheme test suite for examples.
+
+---
+
+## 9. Developer review checklist
+
+Before considering the 1.11.0 → 1.12.0 upgrade complete, a developer
 SHOULD confirm:
+
+### Security review
 
 - [ ] The security advisories SA-CONTRIB-2025-112 and SA-CONTRIB-2025-113
       have been addressed by the upgrade.
-- [ ] Sub-theme overrides have been reviewed to ensure they don't
-      reintroduce the patched vulnerabilities.
+- [ ] XSS testing (Section 8) has been performed and no alerts appear.
+- [ ] Sub-theme `heading.twig` override (if any) has `|raw` removed.
+- [ ] Sub-theme `button.twig` override (if any) has `|raw` removed.
+- [ ] All uses of `|raw` on user-entered data have been reviewed/removed.
+- [ ] CivicTheme API calls updated to pass `$variables` argument.
+- [ ] Title/label outputs use `Xss::filter()` and `strip_tags()`.
+- [ ] Link text outputs use `Xss::filter()`.
+- [ ] Menu item titles use `Xss::filter()`.
+- [ ] iframe paragraph `field_c_p_attributes` has been removed (if used).
+- [ ] Content Author/Approver roles cannot edit Icons media type.
+
+### Customisation register
+
 - [ ] The customisation register has been refreshed and all known
       CivicTheme-related customisations are listed with stable IDs.
 - [ ] All customisations identified as affected by 1.12.0 have been
       reviewed and either updated, replaced or explicitly retired.
+
+### Functional review
+
 - [ ] The project builds successfully and basic smoke tests (cache clear,
       config import, entity updates) complete without errors.
 - [ ] Key pages and components that rely on CivicTheme (home, search,
       navigation, attachments, menus, forms) have been manually reviewed.
+- [ ] Entity reference fields only show entities the user has access to
+      (information disclosure fix verified).
+
+### Documentation
+
 - [ ] Any regressions or follow-up tasks are captured in
       `tasks.md` or in a project issue tracker.
 - [ ] This spec, `tasks.md` and `playbook.md` accurately reflect what was
