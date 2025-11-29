@@ -23,6 +23,12 @@ project-specific customisations require it.
   - A working Drupal code base using CivicTheme `1.10.0`.
   - Composer-based dependency management.
   - Git version control with access to history for custom themes.
+- Drupal core is already on a version compatible with CivicTheme 1.11.0:
+  - Upstream `civictheme.info.yml` changes the requirement to  
+    `core_version_requirement: ^10.2 || ^11`.
+  - If the project is still on Drupal `<10.2`, plan and execute the
+    Drupal core upgrade as a **separate** (but prerequisite) piece of
+    work before applying this CivicTheme step.
 - Standard organisational safeguards apply:
   - Backups and/or database snapshots exist prior to running the upgrade.
   - Deployments are reviewed via merge requests or equivalent.
@@ -32,8 +38,8 @@ project-specific customisations require it.
 Out of scope:
 
 - Production deployment steps.
-- Non-CivicTheme-related module or core Drupal upgrades (these MAY be
-  referenced if tightly coupled but are not the primary focus).
+- The detailed mechanics of upgrading Drupal core itself (these MAY be
+  referenced where required by CivicTheme but are not the primary focus).
 
 ---
 
@@ -44,8 +50,14 @@ preparing and validating this upgrade:
 
 - **Release notes**: CivicTheme `1.11.0` on drupal.org  
   `https://www.drupal.org/project/civictheme/releases/1.11.0`
-- **CivicTheme documentation portal**:  
+- **CivicTheme documentation portal (including 1.11.0 release notes)**:  
   `https://docs.civictheme.io/`
+- **Single Directory Components (SDC) guidance** for CivicTheme and
+  Drupal core 10.2+/10.3+ (see relevant sections under
+  `https://docs.civictheme.io`).
+- **CivicTheme Upgrade Tools – SDC update script** (for optional
+  automated conversion of components to SDC) – see the `sdc-update`
+  tooling in the CivicTheme upgrade-tools repository and its README.
 - **Upstream code diff** (1.10.0 → 1.11.0):  
   `https://git.drupalcode.org/project/civictheme/-/compare/1.10.0...1.11.0?from_project_id=86817`
 
@@ -60,22 +72,38 @@ for the `1.10.0 → 1.11.0` upgrade.
 From the release notes and diff, CivicTheme 1.11.0 introduces, among other
 changes:
 
-- **Component architecture**:
-  - Migration of components to Single Directory Components (SDC) and
-    support for SDC in Drupal 10.3+.
-  - Adjustments to component structure and template discovery.
-- **Design system and components**:
-  - Updates to certain Twig templates and component behaviours.
-  - Potential new or adjusted configuration options for components.
-- **Theming and assets**:
-  - Possible changes to SCSS, JavaScript and asset loading patterns to
-    align with SDC and updated components.
-- **Miscellaneous fixes and improvements**:
-  - Bug fixes, accessibility tweaks and documentation updates.
+- **Component architecture & SDC adoption**:
+  - Core CivicTheme components are migrated towards **Single Directory
+    Components (SDC)** to align with Drupal 10.2+/10.3+.
+  - New `.component.yml` definitions and per-component `.css` files are
+    added across the component tree.
+  - A new `civictheme_table_of_contents` theme hook and corresponding
+    component are introduced.
+- **Theming and build assets**:
+  - Global CSS and JS outputs are restructured:
+    - `dist/civictheme.css` is split into
+      `dist/civictheme.base.css`, `dist/civictheme.theme.css`
+      and `dist/civictheme.variables.css`.
+    - `dist/civictheme.js` is replaced by
+      `dist/civictheme.drupal.base.js` (plus a Storybook base bundle).
+  - The `civictheme.libraries.yml` `global` library is updated to attach
+    the new CSS/JS files; linting/build tooling (`build.js`,
+    `build-config.json`) is extended for SDC and new bundles.
+- **Theme bootstrap & behaviour**:
+  - `civictheme.theme` now integrates with Drupal’s SDC plugin manager
+    to attach the `civictheme:alert` component library for authenticated
+    users, with appropriate error handling.
+  - API examples for `hook_civictheme_automated_list_view_info_alter()`
+    switch from a generic `'event'` content type to the canonical
+    `civictheme_event` machine name.
+- **Starter kit and Storybook**:
+  - The starter kit’s `build.js`, Storybook config and asset pipeline are
+    updated to match the new SDC-aware build.
 
 For a real project, refine this section with concrete notes pulled from
 the release notes and diff, including any *breaking* or *deprecated*
-patterns relevant to your current usage.
+patterns relevant to your current usage (for example, references to
+`dist/civictheme.css` in sub-themes or custom build scripts).
 
 ---
 
@@ -94,11 +122,17 @@ entries such as:
 In a real project, replace the placeholder with your actual inventory.
 For 1.10.0 → 1.11.0, focus on entries that intersect with:
 
-- Components that are being converted to SDC.
-- Twig templates that override upstream CivicTheme templates.
-- SCSS/JS that depends on specific component markup or classes.
-- Configuration overrides (e.g. view modes, blocks, menus) tied to
-  CivicTheme components.
+- Components that are being converted to SDC, or that now have
+  `.component.yml` definitions and/or per-component `.css` bundles.
+- Twig templates that override upstream CivicTheme templates, especially
+  components under `components/00-base`, `01-atoms`, `02-molecules` and
+  `03-organisms`.
+- SCSS/JS that depends on specific component markup or classes, or on
+  global assets previously exposed as `dist/civictheme.css` or
+  `dist/civictheme.js`.
+- Configuration overrides (e.g. view modes, blocks, menus, Layout
+  Builder configuration) tied to CivicTheme components, including
+  navigation, alerts, table-of-contents and field/paragraph displays.
 
 Each relevant customisation SHOULD be cross-referenced by ID (e.g. `C5`,
 `C7`) in the tasks and playbook.
@@ -110,20 +144,30 @@ Each relevant customisation SHOULD be cross-referenced by ID (e.g. `C5`,
 Based on upstream changes and the customisation inventory, typical risk
 areas for this upgrade include:
 
-- **Template compatibility**:
-  - Overridden Twig templates may no longer match upstream structure after
-    SDC changes.
-  - Custom SDC components may require directory structure or annotation
-    updates.
-- **SCSS/JS compatibility**:
+- **Template & SDC compatibility**:
+  - Overridden Twig templates may no longer match upstream structure
+    after SDC-related refactors.
+  - Custom components that start using `.component.yml` definitions may
+    require directory structure, naming or annotation updates to remain
+    discoverable by Drupal’s SDC system.
+- **SCSS/JS and asset pipeline compatibility**:
   - Changes in markup or CSS class names could break custom styling or
     scripts.
+  - Sub-themes or build scripts that reference `dist/civictheme.css` or
+    `dist/civictheme.js` directly must be updated to the new
+    split bundles and file names.
 - **Configuration dependencies**:
-  - View modes, blocks or layouts that rely on specific CivicTheme
-    components may need review.
+  - View modes, blocks or Layout Builder sections that rely on CivicTheme
+    components (including alerts, table-of-contents and form/field
+    components) may need review.
+- **Drupal core and module compatibility**:
+  - Sites still on Drupal `<10.2` cannot adopt CivicTheme 1.11.0 without
+    a core upgrade; SDC features may depend on core 10.2+/10.3+ and the
+    appropriate core modules being enabled.
 - **Regression risk on key pages**:
   - Landing pages, search, news or other high-traffic patterns that make
-    heavy use of CivicTheme components.
+    heavy use of CivicTheme components (especially lists, cards, forms
+    and navigation) carry higher regression risk.
 
 Projects SHOULD explicitly list their own high-risk areas here (for
 example, “news landing pages using custom teaser card overrides
@@ -137,18 +181,32 @@ The intended strategy for this upgrade is:
 
 1. **Discovery**
    - Confirm current CivicTheme version is `1.10.0`.
+   - Confirm Drupal core is on a version compatible with
+     `core_version_requirement: ^10.2 || ^11`; if not, record the
+     dependency and plan a separate core upgrade.
    - Refresh the customisation register and identify entries impacted by
-     SDC and component changes.
-   - Review the 1.11.0 release notes and diff, annotating which upstream
-     changes touch local customisations.
+     SDC and component changes, including any custom build tooling that
+     references old asset names.
+   - Review the 1.11.0 release notes, CivicTheme docs and git diff,
+     annotating which upstream changes touch local customisations.
 2. **Change**
-   - Apply the composer update for CivicTheme (and any tightly coupled
-     dependencies) to move from `1.10.0` to `1.11.0`.
+   - Apply the Composer update for CivicTheme (and any tightly coupled
+     dependencies) to move from `1.10.0` to `1.11.0`, ensuring both
+     `composer.json` and `composer.lock` are updated together.
    - Reconcile overridden Twig templates, SCSS and JS with upstream
      changes, updating or retiring overrides as needed.
-   - Adjust configuration where component APIs or behaviour changed.
+   - Update sub-theme libraries and build scripts where they reference
+     old global asset file names (`dist/civictheme.css`,
+     `dist/civictheme.js`) so they align with the new split bundles.
+   - Evaluate and, where appropriate, run the SDC update tooling against
+     custom components, reviewing all generated changes before commit.
+   - Adjust configuration where component APIs or behaviour changed (for
+     example automated lists, alerts, table-of-contents, navigation).
 3. **Validation**
-   - Run through targeted checks on key pages and components.
+   - Run through targeted checks on key pages and components, including
+     SDC-backed components and forms.
+   - Confirm Storybook/design-system builds (where used) still succeed
+     and reflect the updated components.
    - Record observations, regressions and follow-ups in the per-version
      docs and (where applicable) the customisation register.
 
@@ -188,10 +246,14 @@ SHOULD confirm:
       CivicTheme-related customisations are listed with stable IDs.
 - [ ] All customisations identified as affected by 1.11.0 have been
       reviewed and either updated, replaced or explicitly retired.
+- [ ] Drupal core meets the `^10.2 || ^11` requirement and any core /
+      module changes required for SDC are documented (even if implemented
+      under a separate upgrade step).
 - [ ] The project builds successfully and basic smoke tests (cache clear,
       config import, entity updates) complete without errors.
 - [ ] Key pages and components that rely on CivicTheme (home, search,
-      article/landing pages, navigation) have been manually reviewed.
+      article/landing pages, navigation, alerts, table-of-contents,
+      forms) have been manually reviewed.
 - [ ] Any regressions or follow-up tasks are captured in
       `tasks.md` or in a project issue tracker.
 - [ ] This spec, `tasks.md` and `playbook.md` accurately reflect what was
