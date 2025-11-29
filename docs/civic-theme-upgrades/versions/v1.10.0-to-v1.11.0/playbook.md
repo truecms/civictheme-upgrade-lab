@@ -258,6 +258,17 @@ fi
 # T103d: Check package.json for SDC dependency
 echo "=== Package.json dependencies ==="
 grep "@civictheme" $SUBTHEME_PATH/package.json 2>/dev/null || echo "No @civictheme deps found"
+
+# T103e: Capture custom library attachments (record in planning.md)
+echo "=== Custom attach_library / #attached usage ==="
+grep -rn "attach_library" $SUBTHEME_PATH/templates/ $SUBTHEME_PATH | head -100
+grep -rn "#attached" $SUBTHEME_PATH | head -100
+echo "=== Custom libraries defined ==="
+grep -E "^[A-Za-z0-9_.-]+:" $SUBTHEME_PATH/*.libraries.yml | head -50
+
+# Record the library name, file path, and attach location in
+# docs/civic-theme-upgrades/versions/v1.10.0-to-v1.11.0/planning.md so they
+# can be restored after the upgrade.
 ```
 
 ### 2.4 Use CivicTheme upgrade-tools (optional helper) (T116a)
@@ -485,7 +496,19 @@ css-variables:
       dist/styles.variables.css: { preprocess: false, weight: 10 }
 ```
 
-### 3.7 Update build tooling (T116)
+### 3.7 Restore custom library attachments (T115a)
+
+Use the table you wrote in `planning.md` during T103e to re-attach any
+custom libraries that were previously loading bespoke CSS/JS:
+
+- Re-add the libraries to `<subtheme>.libraries.yml` if they were removed or
+  renamed.
+- Restore `attach_library()` calls (Twig) or `#attached` entries
+  (preprocess/hooks) where they originally loaded.
+- Clear caches and spot-check pages that rely on those libraries (events,
+  workshop filters, feedback blocks, etc.).
+
+### 3.8 Update build tooling (T116)
 
 **Option A – Use SDC Update Tool** (recommended):
 
@@ -537,7 +560,7 @@ git diff
 
 3. Update `.storybook/preview.js` to match starter kit.
 
-### 3.8 Add SDC prop schema enforcement (T117) – Optional
+### 3.9 Add SDC prop schema enforcement (T117) – Optional
 
 Add to `<subtheme>.info.yml`:
 
@@ -547,7 +570,7 @@ enforce_prop_schemas: true
 
 This enables validation of component props against schemas.
 
-### 3.9 Rebuild sub-theme assets
+### 3.10 Rebuild sub-theme assets
 
 ```bash
 # RECOMMENDED: Using ahoy fe (equivalent to npm run build from theme directory)

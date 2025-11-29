@@ -297,6 +297,23 @@ grep -rn "file" $SUBTHEME_PATH/templates/
 find $SUBTHEME_PATH -name "*attachment*" -o -name "*file*" 2>/dev/null
 ```
 
+### 2.7 Capture custom library attachments (T204c)
+
+```bash
+SUBTHEME_PATH=/path/to/your/subtheme
+
+echo "=== attach_library / #attached usage ==="
+grep -rn "attach_library" $SUBTHEME_PATH/templates/ $SUBTHEME_PATH | head -100
+grep -rn "#attached" $SUBTHEME_PATH | head -100
+
+echo "=== Custom libraries defined ==="
+grep -E "^[A-Za-z0-9_.-]+:" $SUBTHEME_PATH/*.libraries.yml | head -50
+
+# Record library name, files, and attach locations in
+# docs/civic-theme-upgrades/versions/v1.11.0-to-v1.12.0/planning.md so they can
+# be restored after the upgrade.
+```
+
 ### 2.8 Audit build tooling and CSS variables (T204)
 
 ```bash
@@ -589,7 +606,17 @@ function yourtheme_preprocess_paragraph__civictheme_iframe(&$variables) {
 }
 ```
 
-### 3.8 Update user permissions for Icons media type (T217)
+### 3.8 Restore custom library attachments (T217)
+
+Using the records captured in `planning.md`, re-attach any custom libraries and
+their CSS/JS assets:
+
+- Re-add libraries to `<subtheme>.libraries.yml` if removed or renamed.
+- Restore Twig `attach_library()` and preprocess `#attached` entries.
+- Clear caches and spot-check pages that rely on these libraries (events,
+  filters, feedback blocks, etc.).
+
+### 3.9 Update user permissions for Icons media type (T218)
 
 **Important**: The `civictheme_embed_svg()` function does NOT protect
 against XSS – it relies on an appropriate level of trust in users managing
@@ -617,7 +644,7 @@ Or update via admin UI: `/admin/people/permissions`
 
 Only trusted administrators should be able to upload and manage SVG icons.
 
-### 3.9 Update menu customisations (T218) – if applicable
+### 3.10 Update menu customisations (T219) – if applicable
 
 If menu overrides were identified in Section 2.5:
 
@@ -1221,4 +1248,3 @@ var(--ct-primary-color)
 This completes the runbook for the CivicTheme `1.11.0` → `1.12.0` upgrade.
 For questions or issues, consult the upstream documentation at
 https://docs.civictheme.io/changelog
-

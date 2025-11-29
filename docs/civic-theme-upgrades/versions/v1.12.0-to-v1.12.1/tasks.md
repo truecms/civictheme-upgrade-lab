@@ -47,6 +47,13 @@ media was being stripped from WYSIWYG content.
     customisations have been added since the 1.12.0 upgrade.
   - Mark any customisations affected by this release.
 
+- [ ] T304 [P] Capture custom library attachments pre-upgrade
+  - Grep Twig and preprocess/hooks for `attach_library` / `#attached` usage to
+    list custom sub-theme libraries.
+  - List custom libraries defined in `<subtheme>.libraries.yml`.
+  - Record library name, files, and attach locations in this version’s
+    `planning.md` so they can be restored after the upgrade.
+
 ---
 
 ## Change tasks
@@ -74,6 +81,14 @@ media was being stripped from WYSIWYG content.
     - Or native: `npm run build` or `npm run dist`.
   - Verify build completes without errors.
   - This picks up the updated `@civictheme/sdc` 1.12.1 package.
+
+- [ ] T313 Restore custom library attachments captured in `planning.md`
+  - Re-add custom libraries (CSS/JS) to `<subtheme>.libraries.yml` if removed
+    or renamed by the upgrade.
+  - Restore Twig `attach_library()` and preprocess `#attached` entries noted
+    in `planning.md`.
+  - Clear caches and verify pages depending on those libraries still load the
+    assets.
 
 ---
 
@@ -146,4 +161,3 @@ media was being stripped from WYSIWYG content.
     - Workarounds removed (if any).
     - Embedded media rendering verified.
     - Post-update hook execution confirmed.
-

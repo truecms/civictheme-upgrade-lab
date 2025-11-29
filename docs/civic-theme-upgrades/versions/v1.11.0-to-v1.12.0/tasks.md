@@ -158,6 +158,12 @@ accordingly.
     grep -rn "var(--ct-" <subtheme>/scss/
     ```
   - Document current state and potential migration opportunities.
+  - **T204c [P]**: Capture custom library attachments **before any changes**:
+    - Grep Twig and preprocess/hooks for `attach_library` / `#attached` usage
+      to list custom sub-theme libraries.
+    - List custom libraries defined in `<subtheme>.libraries.yml`.
+    - Record library name, files, and attach locations in
+      `planning.md` for this version so they can be restored post-upgrade.
 
 - [ ] T205 Map findings to customisation register
   - For each finding in T203 and T204:
@@ -266,9 +272,17 @@ accordingly.
         $referenced_item = civictheme_get_field_referenced_entity($item, 'field_c_p_reference', $variables);
         if ($referenced_item instanceof EntityInterface) {
           $variables['rows'][] = $builder->view($item);
-        }
       }
     }
+  }
+
+- [ ] T217 Restore custom library attachments captured in `planning.md`
+  - Re-add custom libraries (CSS/JS) to `<subtheme>.libraries.yml` if removed
+    or renamed by the upgrade.
+  - Restore Twig `attach_library()` and preprocess `#attached` entries noted
+    in `planning.md`.
+  - Clear caches and verify pages depending on those libraries still load the
+    assets (events, filters, feedback blocks, etc.).
     ```
 
 - [ ] T216 Remove iframe paragraph attributes field (if applicable)
@@ -286,7 +300,7 @@ accordingly.
     ```
   - **T216c**: Update preprocess to add required iframe attributes in code.
 
-- [ ] T217 Update user permissions for Icons media type
+- [ ] T218 Update user permissions for Icons media type
   - Remove from Content Author role:
     - "create media" for Icons
     - "edit any media" for Icons
@@ -295,7 +309,7 @@ accordingly.
     - "edit any media" for Icons
   - Export configuration: `drush cex -y`
 
-- [ ] T218 Update menu customisations (if applicable)
+- [ ] T219 Update menu customisations (if applicable)
   - For menu-related templates identified in T203g:
     - Compare with upstream CivicTheme 1.12.0 menu templates.
     - Verify compatibility with enhanced menu theming system.
@@ -441,4 +455,3 @@ accordingly.
     - XSS filtering added to title/label outputs.
     - Customisations reviewed/updated.
     - Any remaining issues or known regressions.
-

@@ -102,6 +102,8 @@ if they override affected components.
    - Review security advisories.
    - Audit sub-theme for security-relevant overrides.
    - Document customisation impact.
+   - Capture current custom library attachments (libraries.yml entries and
+     Twig/`#attached` usages) in the table below before making any changes.
 
 2. **High-priority changes** (security):
    - Update Composer dependencies.
@@ -132,6 +134,16 @@ the playbook.)*
 ---
 
 ## 3. Open questions / risks
+
+### Pre-upgrade capture: custom library attachments
+
+| Library | Files referenced | Where attached (Twig/preprocess) | Notes |
+|---------|------------------|-----------------------------------|-------|
+| (fill)  |                  |                                   |       |
+
+Use this table during T204c to list every custom sub-theme library and its
+attach points so they can be restored after the upgrade if overrides are
+lost.
 
 ### Resolved
 
@@ -248,4 +260,3 @@ Record key decisions made during planning:
 
 Once tasks are stable, ensure they are recorded in `tasks.md` with clear IDs
 and that `playbook.md` is updated to reflect the agreed execution order.
-
