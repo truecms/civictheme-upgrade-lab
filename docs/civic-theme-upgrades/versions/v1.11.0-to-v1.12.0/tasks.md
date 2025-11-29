@@ -95,6 +95,11 @@ accordingly.
   - Record findings and flag high-risk overrides.
 
 - [ ] T203e Audit sub-theme preprocess functions for API updates
+  - First, list all entity reference fields in the project:
+    ```bash
+    grep -l "type: entity_reference" config/sync/field.storage*.yml | \
+      xargs grep "^field_name:" | awk '{print $2}'
+    ```
   - Search for CivicTheme API function calls that need `$variables` argument:
     ```bash
     grep -rn "civictheme_get_field_referenced_entities" <subtheme>/*.theme
@@ -107,6 +112,8 @@ accordingly.
     grep -rn "civictheme_get_referenced_entity_labels" <subtheme>/includes/
     ```
   - Each match needs updating to pass `$variables` as argument.
+  - **Note**: If NOT using CivicTheme API functions for entity reference
+    fields, you are responsible for implementing access checks.
 
 - [ ] T203f Audit sub-theme preprocess for title/label XSS filtering
   - Search for title/label output without filtering:

@@ -92,7 +92,16 @@ remediation steps.
 #### 3.1.1 Twig component XSS fixes
 
 CivicTheme 1.12.0 removes the `|raw` filter from content outputs in key
-components to prevent XSS attacks:
+components to prevent XSS attacks. The vulnerability was caused by
+**insufficient filtering of field data before rendering in Twig templates**,
+combined with the use of the `raw` filter in multiple components.
+
+This allowed injection of malicious scripts into browser contexts through:
+
+- Text fields in CivicTheme components
+- Node and taxonomy term titles
+- Link text fields
+- Menu item titles
 
 **`heading.twig` change**:
 
@@ -115,9 +124,33 @@ fields, you will need additional work to implement safe rendering.
 
 #### 3.1.2 CivicTheme API changes for cacheability and access control
 
-CivicTheme 1.12.0 updates the field retrieval API to properly manage
-cacheable metadata and entity access control. The following functions
-now require a `$build` argument:
+CivicTheme provides a field API system for retrieving commonly used field
+values specific to CivicTheme. **We strongly recommend using this system
+solely to retrieve field data for use within components.** Not using this
+API means the developer is responsible for implementing XSS mitigations.
+
+The following functions are available:
+
+- `civictheme_get_field_value` – retrieves field values from fields that
+  CivicTheme regularly uses. All field types within CivicTheme are
+  supported and several more.
+- `civictheme_get_field_referenced_entities` – retrieves and checks access
+  to referenced entities in a field of an entity. Also manages the
+  cacheability metadata for the referenced entities.
+- `civictheme_get_field_referenced_entity` – retrieves the first
+  referenced entity in a field of an entity.
+- `civictheme_get_referenced_entity_labels` – retrieves labels of the
+  referenced entities.
+- `civictheme_embed_svg` – embeds SVG from provided URL. Note: This
+  function does not protect against XSS and relies on appropriate level
+  of user managing SVG Icons.
+
+Review `web/themes/contrib/civictheme/includes/utilities.inc` for these
+utility functions.
+
+CivicTheme 1.12.0 updates these functions to properly manage cacheable
+metadata and entity access control. The following functions now require
+a `$build` argument:
 
 | Function | Change |
 |----------|--------|
@@ -142,11 +175,21 @@ CivicTheme API functions MUST be updated to pass the `$variables` array.
 #### 3.1.3 Information disclosure fix
 
 CivicTheme 1.12.0 fixes information disclosure on entity reference fields
-by implementing proper access checking. The updated API functions now:
+by implementing proper access checking. The vulnerability allowed:
+
+- **Unpublished or archived nodes** (e.g. CivicTheme Page and Event nodes)
+  referenced via card components in manually curated lists or blocks to be
+  rendered for users without permission to view unpublished content.
+- This led to unintended exposure of sensitive information including
+  titles, teasers, and other field data from restricted content.
+
+The updated API functions now:
 
 - Check entity access before returning referenced entities.
 - Properly manage cacheability metadata for referenced entities.
 - Return only entities the current user has permission to view.
+- Handle manual lists by checking access to referenced entities before
+  rendering cards (prevents empty columns for inaccessible content).
 
 **Sub-theme impact**: If your sub-theme accesses entity reference fields
 directly (not via CivicTheme API), you are responsible for implementing

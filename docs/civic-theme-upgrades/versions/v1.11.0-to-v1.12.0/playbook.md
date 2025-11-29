@@ -197,6 +197,17 @@ is an XSS vulnerability.
 
 ### 2.3 Audit sub-theme preprocess functions for API updates (T203e)
 
+First, identify all entity reference fields in your project (useful for
+understanding scope of potential information disclosure):
+
+```bash
+# Find all entity reference fields in config
+grep -l "type: entity_reference" config/sync/field.storage*.yml | \
+  xargs grep "^field_name:" | awk '{print $2}'
+```
+
+Then find CivicTheme API function calls that need `$variables` argument:
+
 ```bash
 SUBTHEME_PATH=/path/to/your/subtheme
 
@@ -219,6 +230,10 @@ grep -rn "civictheme_get_referenced_entity_labels" $SUBTHEME_PATH/includes/
 ```
 
 **Record the output**. Each match needs updating to pass `$variables` argument.
+
+**Important**: If you do NOT use these CivicTheme API functions and instead
+access entity reference fields directly, you are responsible for ensuring
+users have adequate access to those entities in your sub-theme.
 
 ### 2.4 Audit sub-theme preprocess for title/label XSS filtering (T203f)
 
@@ -568,6 +583,11 @@ function yourtheme_preprocess_paragraph__civictheme_iframe(&$variables) {
 
 ### 3.8 Update user permissions for Icons media type (T217)
 
+**Important**: The `civictheme_embed_svg()` function does NOT protect
+against XSS – it relies on an appropriate level of trust in users managing
+SVG Icons. Therefore, Content Authors and Approvers should not have
+permission to create or edit SVG icons.
+
 Remove permissions that allow Content Authors/Approvers to edit SVG icons:
 
 ```bash
@@ -586,6 +606,8 @@ drush cex -y
 ```
 
 Or update via admin UI: `/admin/people/permissions`
+
+Only trusted administrators should be able to upload and manage SVG icons.
 
 ### 3.9 Update menu customisations (T218) – if applicable
 
