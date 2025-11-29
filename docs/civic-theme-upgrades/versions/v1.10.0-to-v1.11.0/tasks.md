@@ -20,6 +20,48 @@ They are intended to be adapted per project; IDs here are examples.
   - **Blocker**: If Drupal is `<10.2`, this CivicTheme upgrade is blocked.
     Create a separate issue for Drupal core upgrade and complete that
     first.
+  - **Note**: Use `ahoy drush` or `docker compose exec cli drush` if
+    running in a Docker-based local environment.
+
+- [ ] T100a [P] Discover available front-end commands
+  - Check `.ahoy.yml` for front-end commands:
+    ```bash
+    grep -E "^\s*(fe|front|npm|build|storybook)" .ahoy.yml
+    grep -A 10 "^\s*fe:" .ahoy.yml  # Check what 'fe' command does
+    ```
+    Common patterns: `ahoy fe`, `ahoy build`, `ahoy storybook`.
+  - **Key**: `ahoy fe` as a standalone command (no arguments) typically
+    runs the complete front-end build (npm install + npm run build).
+  - For specific npm commands, pass as arguments: `ahoy fe npm run storybook`.
+  - Document discovered commands in the planning notes.
+
+- [ ] T100b [P] Discover available test commands
+  - Check `.ahoy.yml` for test-related commands:
+    ```bash
+    grep -i "test" .ahoy.yml
+    ```
+    Common patterns: `ahoy test-bdd`, `ahoy test-unit`, `ahoy test-playwright`,
+    `ahoy test-kernel`, `ahoy lint`.
+  - Check `composer.json` for test scripts:
+    ```bash
+    grep -A 30 '"scripts"' composer.json | grep -i "test"
+    ```
+    Common patterns: `composer test`, `composer test-behat`,
+    `composer test-phpunit`.
+  - Document discovered commands in the planning notes.
+
+- [ ] T100c [P] Run tests before upgrade (baseline)
+  - Execute all discovered test commands to establish a passing baseline.
+  - Record results: which tests pass, which fail (pre-existing).
+  - **Blocker**: If critical tests fail, fix them before proceeding with
+    the upgrade. Do not upgrade on a broken baseline.
+  - Example commands (adjust based on T100b discovery):
+    ```bash
+    ahoy test-unit
+    ahoy test-bdd
+    composer test
+    docker compose exec cli ./vendor/bin/phpunit
+    ```
 
 - [ ] T101 [P] Refresh customisation register
   - Update `docs/civic-theme-upgrades/customisations.md` using Git history
@@ -162,7 +204,7 @@ They are intended to be adapted per project; IDs here are examples.
 - [ ] T116 Update build tooling (choose one approach)
   - **T116a – Use SDC Update Tool** (recommended):
     - Confirm prerequisites: Node.js 22+, Anthropic API key.
-    - Clone `https://github.com/civictheme/upgrade-tools`.
+        - Clone `https://github.com/civictheme/upgrade-tools`.
     - Run `npm install` in the cloned repo.
     - Create `.env` with:
       - `SUBTHEME_PATH=/absolute/path/to/subtheme`
@@ -230,13 +272,35 @@ They are intended to be adapted per project; IDs here are examples.
   - Verify SDC-backed components have correct prop interfaces.
 
 - [ ] T125 Test sub-theme build
-  - Run `npm run build` or `npm run dist` in sub-theme.
+  - Run front-end build using discovered command from T100a:
+    - **Recommended**: `ahoy fe` (standalone - does npm install + build).
+    - Or specific: `ahoy fe npm run build`.
+    - Or native: `npm run build` or `npm run dist`.
+    - Or docker: `docker compose exec cli bash -c "cd web/themes/custom/yourtheme && npm run build"`.
   - Verify build completes without errors.
   - Check that output files are generated:
     - `dist/styles.base.css`
     - `dist/styles.theme.css`
     - `dist/styles.variables.css`
     - `dist/scripts.drupal.base.js`
+
+- [ ] T125b [P] Run tests after upgrade (regression check)
+  - Execute the same test commands discovered in T100b.
+  - Compare results with baseline recorded in T100c:
+    - Tests that passed before and fail now = **REGRESSION** (must fix).
+    - Tests that failed before and fail now = **PRE-EXISTING** (document).
+    - Tests that failed before and pass now = **IMPROVEMENT** (document).
+  - Example commands (adjust based on project):
+    ```bash
+    ahoy test-unit
+    ahoy test-bdd
+    ahoy test-playwright
+    composer test
+    docker compose exec cli ./vendor/bin/phpunit
+    docker compose exec cli ./vendor/bin/behat
+    ```
+  - **Blocker**: Do not merge if regressions are introduced. Fix failing
+    tests before proceeding.
 
 - [ ] T126 Update customisation register
   - For each customisation impacted by the upgrade:

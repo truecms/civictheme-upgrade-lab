@@ -403,6 +403,17 @@ thorough preparation than typical minor version bumps.
      `^10.2 || ^11`). If Drupal is <10.2, **stop** and plan a separate
      core upgrade first.
    - Ensure Git working tree is clean with a dedicated feature branch.
+   - **Note**: If using Docker-based local development, commands should
+     run inside the CLI container via `ahoy` or `docker compose exec cli`.
+
+2. **Discover and run tests (baseline)**:
+   - Check `.ahoy.yml` for test commands: `grep -i "test" .ahoy.yml`.
+   - Check `composer.json` for test scripts: look for `test-*` scripts.
+   - Common test commands: `ahoy test-bdd`, `ahoy test-unit`,
+     `ahoy test-playwright`, `composer test`.
+   - Run all available tests and record results as baseline.
+   - **Stop condition**: If critical tests fail before upgrade, fix them
+     first. Do not upgrade on a broken baseline.
 
 2. **Audit sub-theme Twig templates**:
    - Search for all `{% include '@atoms/` patterns.

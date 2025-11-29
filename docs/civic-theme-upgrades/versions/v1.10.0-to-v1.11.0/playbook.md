@@ -19,13 +19,44 @@ non-production upgrade of CivicTheme from `1.10.0` to `1.11.0`.
 echo $ENVIRONMENT  # Should be 'local', 'dev', 'staging', etc.
 ```
 
-### 1.2 Create backups
+### 1.2 Docker/local development environment notes
+
+Most CivicTheme projects use Docker-based local development with containers
+for nginx, php-fpm, and a CLI container. Commands that interact with Drupal
+(drush, composer, npm) typically run **inside the CLI container**.
+
+**Common patterns**:
+
+- **Ahoy wrapper** (if `.ahoy.yml` exists): Use `ahoy <command>` which wraps
+  docker-compose exec calls.
+- **Direct docker-compose**: Use `docker compose exec cli <command>`.
+- **Native** (if not using Docker): Run commands directly.
+
+```bash
+# Check if ahoy is available
+which ahoy && cat .ahoy.yml | head -20
+
+# Example: Running drush via different methods
+# Option A: Ahoy (recommended if available)
+ahoy drush status
+
+# Option B: Docker compose directly
+docker compose exec cli drush status
+
+# Option C: Native (non-Docker environments)
+drush status
+```
+
+**Throughout this playbook**, commands are shown in native form. Prefix with
+`ahoy` or `docker compose exec cli` as appropriate for your environment.
+
+### 1.3 Create backups
 
 - [ ] Database backup created and verified.
 - [ ] Files backup created (if applicable).
 - [ ] Able to restore to pre-upgrade state if needed.
 
-### 1.3 Create dedicated feature branch
+### 1.4 Create dedicated feature branch
 
 ```bash
 cd /path/to/drupal/project
@@ -34,10 +65,10 @@ git pull origin develop
 git checkout -b feature/civictheme-1.11-upgrade
 ```
 
-### 1.4 Verify Drupal core version
+### 1.5 Verify Drupal core version
 
 ```bash
-# Check Drupal core version
+# Check Drupal core version (use ahoy/docker as needed)
 drush status --field=drupal-version
 
 # Or via composer
@@ -48,14 +79,119 @@ composer show drupal/core | grep versions
 CivicTheme 1.11.0 requires `core_version_requirement: ^10.2 || ^11`.
 Plan a separate Drupal core upgrade first.
 
-### 1.5 Verify current CivicTheme version
+### 1.6 Verify current CivicTheme version
 
 ```bash
 composer show drupal/civictheme | grep versions
 # Expected: 1.10.0
 ```
 
-### 1.6 Review upgrade documentation
+### 1.7 Discover available front-end commands
+
+Before making changes, identify how front-end tooling (npm) is run in this
+project. In Docker environments, npm commands typically run inside a
+container.
+
+```bash
+# Check for ahoy front-end commands
+if [ -f ".ahoy.yml" ]; then
+  echo "=== Ahoy front-end commands ==="
+  grep -E "^\s*(fe|front|npm|build|storybook)" .ahoy.yml | head -20
+  
+  # Look for 'fe' command specifically and check what it does
+  echo "=== Checking 'fe' command details ==="
+  grep -A 10 "^\s*fe:" .ahoy.yml
+fi
+
+# Common front-end command patterns to look for:
+# - ahoy fe               (Full front-end build - install + compile)
+# - ahoy fe npm install   (Run specific npm command via ahoy)
+# - ahoy fe npm run build (Run specific build via ahoy)
+# - ahoy build            (Direct build command)
+# - ahoy storybook        (Start Storybook)
+```
+
+**Document discovered front-end commands**:
+
+| Command | Description | Usage |
+|---------|-------------|-------|
+| `ahoy fe` | Full front-end build (standalone) | Runs npm install + build automatically |
+| `ahoy fe <cmd>` | Run specific npm command | `ahoy fe npm run storybook` |
+| `ahoy build` | Direct build | If available |
+| `ahoy storybook` | Storybook | If available |
+
+**Key insight**: `ahoy fe` as a standalone command (without arguments)
+typically performs the complete front-end build process including
+`npm install` and `npm run build`. Use this as the primary command for
+rebuilding front-end assets.
+
+For specific npm commands, pass them as arguments: `ahoy fe npm run storybook`.
+
+### 1.8 Discover available test commands
+
+Identify what testing capabilities exist in the project. This establishes
+the baseline for regression testing.
+
+```bash
+# Check for ahoy test commands
+if [ -f ".ahoy.yml" ]; then
+  echo "=== Ahoy test commands ==="
+  grep -E "^\s*test" .ahoy.yml || grep -i "test" .ahoy.yml | head -20
+fi
+
+# Check for composer test scripts
+echo "=== Composer test scripts ==="
+grep -A 30 '"scripts"' composer.json | grep -i "test" || echo "No test scripts found"
+
+# Common test command patterns to look for:
+# - ahoy test-bdd         (Behat/BDD tests)
+# - ahoy test-unit        (PHPUnit tests)
+# - ahoy test-playwright  (E2E browser tests)
+# - ahoy test-kernel      (Kernel tests)
+# - ahoy lint             (Code linting)
+# - composer test
+# - composer test-behat
+# - composer test-phpunit
+```
+
+**Document discovered test commands** for use in validation:
+
+| Command | Description | Status |
+|---------|-------------|--------|
+| `ahoy test-???` | [Describe] | Available/Not available |
+| `composer test-???` | [Describe] | Available/Not available |
+
+### 1.9 Run tests BEFORE upgrade (baseline)
+
+**Critical**: Establish that tests pass before making any changes. If tests
+fail before the upgrade, fix them first or document known failures.
+
+```bash
+# Run all available tests (adjust commands based on 1.8 discovery)
+# Example using ahoy:
+ahoy test-unit
+ahoy test-bdd
+ahoy test-playwright
+
+# Example using composer:
+composer test
+
+# Example using docker compose directly:
+docker compose exec cli ./vendor/bin/phpunit
+docker compose exec cli ./vendor/bin/behat
+```
+
+Record test results:
+
+- [ ] Unit tests: PASS / FAIL / N/A
+- [ ] BDD tests: PASS / FAIL / N/A  
+- [ ] E2E tests: PASS / FAIL / N/A
+- [ ] Other tests: PASS / FAIL / N/A
+
+**STOP CONDITION**: If critical tests fail before the upgrade, resolve those
+issues first. Do not proceed with upgrade on a broken test baseline.
+
+### 1.10 Review upgrade documentation
 
 - [ ] Read `spec.md` Section 3 (High-level upstream changes).
 - [ ] Read `spec.md` Section 5 (Risk assessment).
@@ -362,16 +498,24 @@ This enables validation of component props against schemas.
 ### 3.9 Rebuild sub-theme assets
 
 ```bash
+# RECOMMENDED: Using ahoy fe (standalone - does everything)
+# This runs npm install + npm run build automatically
+ahoy fe
+
+# Alternative: Using ahoy fe with specific commands
+ahoy fe npm install
+ahoy fe npm run build
+
+# Alternative: Native (non-Docker environments)
 cd $SUBTHEME_PATH
-
-# Install/update dependencies
 npm install
-
-# Build assets
 npm run build  # or npm run dist
 
+# Alternative: Using docker compose directly
+docker compose exec cli bash -c "cd web/themes/custom/yourtheme && npm install && npm run build"
+
 # Verify output files exist
-ls -la dist/
+ls -la $SUBTHEME_PATH/dist/
 # Expected: styles.base.css, styles.theme.css, styles.variables.css,
 #           scripts.drupal.base.js
 ```
@@ -395,8 +539,10 @@ git commit -m "feat: Updated sub-theme for CivicTheme 1.11 SDC migration"
 ### 4.1 Clear caches and run updates (T120)
 
 ```bash
-# Clear all Drupal caches
+# Clear all Drupal caches (use ahoy/docker as appropriate)
 drush cr
+# Or: ahoy drush cr
+# Or: docker compose exec cli drush cr
 
 # Check for and run database updates
 drush updb -y
@@ -471,10 +617,19 @@ Open the site in a browser and manually check:
 ### 4.5 Validate Storybook (T124) – if used
 
 ```bash
-cd $SUBTHEME_PATH
-
 # Start Storybook
+# RECOMMENDED: Using ahoy fe with storybook command
+ahoy fe npm run storybook
+
+# Or using dedicated ahoy storybook (if available):
+ahoy storybook
+
+# Alternative: Native (non-Docker environments)
+cd $SUBTHEME_PATH
 npm run storybook
+
+# Alternative: Using docker compose directly
+docker compose exec cli bash -c "cd web/themes/custom/yourtheme && npm run storybook"
 
 # In browser, check:
 # - Build completes without errors
@@ -488,8 +643,9 @@ npm run storybook
 ```bash
 cd $SUBTHEME_PATH
 
-# Run full build
+# Run full build (use docker if npm is in container)
 npm run build  # or npm run dist
+# Or: docker compose exec cli bash -c "cd web/themes/custom/yourtheme && npm run build"
 
 # Check exit code
 echo $?  # Should be 0
@@ -504,7 +660,45 @@ ls -la dist/
 # - scripts.drupal.base.js
 ```
 
-### 4.7 Document validation results
+### 4.7 Run tests AFTER upgrade (T125b)
+
+Re-run the same tests discovered in Section 1.7 to verify the upgrade has
+not introduced regressions.
+
+```bash
+# Run all available tests (use commands discovered in 1.7)
+# Example using ahoy:
+ahoy test-unit
+ahoy test-bdd
+ahoy test-playwright
+
+# Example using composer:
+composer test
+
+# Example using docker compose directly:
+docker compose exec cli ./vendor/bin/phpunit
+docker compose exec cli ./vendor/bin/behat
+```
+
+**Compare results with pre-upgrade baseline (Section 1.8)**:
+
+| Test Suite | Before Upgrade | After Upgrade | Status |
+|------------|----------------|---------------|--------|
+| Unit tests | PASS/FAIL | PASS/FAIL | ✅/❌ |
+| BDD tests | PASS/FAIL | PASS/FAIL | ✅/❌ |
+| E2E tests | PASS/FAIL | PASS/FAIL | ✅/❌ |
+| Other | PASS/FAIL | PASS/FAIL | ✅/❌ |
+
+**Action required if tests fail**:
+
+1. If a test passed before and fails after → **Regression introduced**.
+   Investigate and fix before proceeding.
+2. If a test failed before and fails after → **Pre-existing issue**.
+   Document but do not block upgrade.
+3. If a test failed before and passes after → **Bonus improvement**.
+   Document the fix.
+
+### 4.9 Document validation results
 
 Create a checklist of validation results:
 
@@ -513,6 +707,13 @@ Create a checklist of validation results:
 
 Date: YYYY-MM-DD
 Tester: [Name]
+
+### Test Suite Results
+| Test Suite | Before Upgrade | After Upgrade | Notes |
+|------------|----------------|---------------|-------|
+| Unit tests | PASS/FAIL | PASS/FAIL | |
+| BDD tests | PASS/FAIL | PASS/FAIL | |
+| E2E tests | PASS/FAIL | PASS/FAIL | |
 
 ### Page Rendering
 - [ ] Home page: PASS/FAIL
