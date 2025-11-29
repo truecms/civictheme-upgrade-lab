@@ -214,12 +214,23 @@ drush updb -y
 # This will run civictheme_post_update_remove_civictheme_iframe_field_c_p_attributes()
 # which removes the iframe attributes field automatically
 
-# Import configuration if pending
+# IMPORTANT: Export configuration BEFORE importing
+# This captures the field removal in the sync directory, preventing the
+# stale 1.12.0 field config from being re-imported and defeating the fix.
+drush cex -y
+
+# Now import any other pending configuration changes
 drush cim -y
 
 # Check for errors
 echo $?  # Should be 0
 ```
+
+**Why export before import?** On config-managed sites, the sync directory may
+still contain the `field_c_p_attributes` configuration from 1.12.0. Running
+`drush cim` without first exporting would restore the field that the post-update
+hook just removed. Exporting first ensures the field removal is captured in the
+sync directory.
 
 ### 4.2 Verify CivicTheme version (T321)
 
