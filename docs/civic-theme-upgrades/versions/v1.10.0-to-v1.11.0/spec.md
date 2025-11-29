@@ -68,6 +68,15 @@ preparing and validating this upgrade:
   - High-level usage (see its README for full details):
     - Requires Node.js 22+, a CivicTheme sub-theme already updated to
       CivicTheme 1.10.x, and an Anthropic API key.
+    - **⛔ STOP CONDITION for AI assistants:** The tool requires an
+      `ANTHROPIC_API_KEY`. Before executing, AI assistants MUST stop and
+      request developer confirmation that the key is available:
+      - **Preferred:** Add `ANTHROPIC_API_KEY=sk-ant-...` to the destination
+        project's `.env` file (ensure it is in `.gitignore`).
+      - **Alternative:** Export the key in the shell session or add to
+        `~/.bashrc` / `~/.zshrc`.
+      - Only proceed after developer confirms the key is configured.
+      - Remind developer to remove/unset the key after upgrade completes.
     - Run in a throwaway working copy or feature branch only (it
       updates `package.json`, Storybook config, `build.js` and
       component directories).
@@ -500,11 +509,17 @@ thorough preparation than typical minor version bumps.
 
 6. **Update build tooling** (if using starter kit build system):
    - **Option A – Use SDC Update Tool** (recommended):
+     - **⛔ STOP CONDITION:** AI assistants MUST stop and request developer
+       confirmation that `ANTHROPIC_API_KEY` is available before proceeding.
+       - **Preferred:** Add to the destination project's `.env` file.
+       - **Alternative:** Export in shell or add to `~/.bashrc` / `~/.zshrc`.
+       - Only proceed after developer confirms.
      - Clone `https://github.com/civictheme/upgrade-tools`.
      - Install dependencies: `npm install`.
      - Configure `.env` with sub-theme path and Anthropic API key.
      - Run `npm run update-components`.
      - Review changes in `.logs/` and apply selectively.
+     - **Post-completion:** Remind developer to remove/unset the key.
    - **Option B – Manual update**:
      - Update `package.json` dependencies to match 1.11.0 starter kit.
      - Copy new `build.js` and `build-config.json` from starter kit.

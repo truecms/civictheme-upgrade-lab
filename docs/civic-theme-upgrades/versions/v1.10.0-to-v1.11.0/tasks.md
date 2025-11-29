@@ -214,6 +214,16 @@ They are intended to be adapted per project; IDs here are examples.
 - [ ] T116 Update build tooling (choose one approach)
   - **T116a – Use CivicTheme upgrade-tools (storybook-v8-update / sdc-update)**
     - Prereqs: Node.js 22+, Anthropic API key available.
+    - **⛔ STOP CONDITION – Anthropic API Key Required**
+      - AI assistants MUST stop and request developer action before proceeding.
+      - The story conversion script requires `ANTHROPIC_API_KEY` to call the
+        Anthropic Claude API.
+      - **Preferred:** Add `ANTHROPIC_API_KEY=sk-ant-...` to the destination
+        project's `.env` file (ensure `.env` is in `.gitignore`).
+      - **Alternative:** Export in shell session or add to `~/.bashrc` /
+        `~/.zshrc` and source the file.
+      - Wait for developer to confirm key is available before proceeding.
+      - **Security:** Remind developer to remove/unset the key after upgrade.
     - Clone tools: `git clone https://github.com/civictheme/upgrade-tools.git`.
     - `cd upgrade-tools/storybook-v8-update && npm install`.
     - Update build + Storybook: `SUBTHEME_DIRECTORY=/abs/path/to/subtheme ./scripts/update-build-and-storybook.sh`.
@@ -224,6 +234,8 @@ They are intended to be adapted per project; IDs here are examples.
       - Wrong `civicthemePath` after script → update `build-config.json` to point to contrib Civictheme directory (e.g. `../contrib/civictheme`).
       - Interactive prompt failure → run the direct script commands above instead of `npm run update-storybook`.
     - Review `.logs/` output and git diff before committing.
+    - **Post-completion:** Remove `ANTHROPIC_API_KEY` from `.env` or unset from
+      shell environment.
   - **T116b – Manual update**:
     - Copy `build.js` from CivicTheme 1.11.0 starter kit.
     - Copy `build-config.json` from starter kit.

@@ -281,9 +281,56 @@ they can be reused across projects.
 **Prerequisites**
 
 - Node.js ≥ 22
-- Anthropic API key available as `ANTHROPIC_API_KEY`
+- **Anthropic API key** (see STOP CONDITION below)
 - Clean working copy or feature branch (the tool rewrites `package.json`,
   `.storybook`, `build.js`, component stories)
+
+---
+
+#### ⛔ STOP CONDITION – Anthropic API Key Required
+
+**AI assistants MUST stop here and request developer action** before proceeding
+with the upgrade-tools. The Storybook story conversion script requires an
+`ANTHROPIC_API_KEY` to call the Anthropic Claude API.
+
+**Action required from developer:**
+
+1. **Preferred method** – Add the key to the destination project's `.env` file
+   (create the file if it does not exist):
+
+   ```bash
+   # In the destination project root directory
+   echo 'ANTHROPIC_API_KEY=sk-ant-...' >> .env
+   ```
+
+   Ensure `.env` is listed in `.gitignore` (it typically is in Drupal projects).
+
+2. **Alternative method** – Export the key in your shell session or shell
+   configuration file (`~/.bashrc`, `~/.zshrc`):
+
+   ```bash
+   export ANTHROPIC_API_KEY=sk-ant-...
+   ```
+
+   If added to a shell configuration file, run `source ~/.bashrc` (or
+   `source ~/.zshrc`) to load the new value.
+
+**⚠️ Security reminder:** The Anthropic API key is a secret credential.
+- Do NOT commit it to version control.
+- Remove or unset the key after the upgrade is complete.
+
+---
+
+**Developer confirmation required:**
+
+> Please confirm how the `ANTHROPIC_API_KEY` has been added:
+>
+> - [ ] Added to `.env` file in the destination project (preferred)
+> - [ ] Exported in shell session / shell configuration file
+>
+> Once confirmed, the AI assistant may proceed with the upgrade-tools execution.
+
+---
 
 **Execution (non-interactive recommended)**
 
@@ -512,6 +559,40 @@ custom libraries that were previously loading bespoke CSS/JS:
 
 **Option A – Use SDC Update Tool** (recommended):
 
+---
+
+#### ⛔ STOP CONDITION – Anthropic API Key Required
+
+**AI assistants MUST stop here if the `ANTHROPIC_API_KEY` has not been
+configured.** This tool requires the key to convert Storybook stories via the
+Anthropic Claude API.
+
+If you have not yet configured the key (or skipped Section 2.4), request
+developer confirmation now:
+
+**Action required from developer:**
+
+1. **Preferred method** – Add to the destination project's `.env` file:
+
+   ```bash
+   echo 'ANTHROPIC_API_KEY=sk-ant-...' >> .env
+   ```
+
+2. **Alternative method** – Export in your shell session or add to
+   `~/.bashrc` / `~/.zshrc`:
+
+   ```bash
+   export ANTHROPIC_API_KEY=sk-ant-...
+   ```
+
+**Developer confirmation required before proceeding:**
+
+> - [ ] `ANTHROPIC_API_KEY` is available (in `.env` or exported in shell)
+>
+> Once confirmed, the AI assistant may proceed.
+
+---
+
 ```bash
 # Clone the upgrade tools repo
 cd /tmp
@@ -521,10 +602,10 @@ cd upgrade-tools/sdc-update
 # Install dependencies
 npm install
 
-# Create .env file
+# Create .env file for the tool (copy key from project .env or shell)
 cat > .env << EOF
 SUBTHEME_PATH=/absolute/path/to/your/subtheme
-ANTHROPIC_API_KEY=your-anthropic-api-key
+ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY
 EOF
 
 # Run the update
@@ -537,6 +618,10 @@ ls -la .logs/
 cd /path/to/your/subtheme
 git diff
 ```
+
+**Post-completion reminder:** Once the upgrade is complete, remove the
+`ANTHROPIC_API_KEY` from the destination project's `.env` file or unset it
+from your shell environment (`unset ANTHROPIC_API_KEY`).
 
 **Option B – Manual update**:
 
