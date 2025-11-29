@@ -19,13 +19,13 @@ Auto-generated from all feature plans. Last updated: 2025-11-29
 docs/
   civic-theme-upgrades/
     customisations.md        # Canonical customisation register (template)
+    planning.md              # Global upgrade documentation framework
     README.md                # Entry point for upgrade documentation
     versions/
       vX.Y.Z-to-vA.B.C/      # Per-version upgrade directories
         spec.md              # What & why (planning, analysis)
         tasks.md             # Checklist of work
         playbook.md          # How (ordered runbook)
-  planning.md                # Global upgrade documentation framework
 specs/
   NNN-feature-name/          # Feature specifications (internal planning)
 ```

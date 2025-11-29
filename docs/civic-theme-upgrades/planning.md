@@ -38,6 +38,7 @@ destination project:
 docs/
   civic-theme-upgrades/
     customisations.md                       # Canonical customisation register
+    planning.md                             # Global framework (this document)
     README.md                               # Entry point and guidance
     versions/
       vX.Y.Z-to-vA.B.C/                     # Example: v1.5.0-to-v1.6.0
@@ -48,11 +49,10 @@ docs/
         spec.md
         tasks.md
         playbook.md
-  planning.md                               # Global framework (this document)
 ```
 
 Notes:
-- `docs/planning.md` is the global framework that you are reading now.
+- `docs/civic-theme-upgrades/planning.md` is the global framework that you are reading now.
 - Each destination project MUST maintain a persistent "CivicTheme customisation
   register" at the canonical path `docs/civic-theme-upgrades/customisations.md`
   so that both humans and AI coding assistants can reliably find it.
@@ -385,7 +385,7 @@ docs/
 4. Fill in `spec.md`:
    - Upstream links for the specific versions.
    - Initial high level change summary from official release notes.
-   - Initial customisation inventory if known, referencing the project’s
+   - Initial customisation inventory if known, referencing the project's
      persistent customisation register.
 
 5. Use the AI task lists (section 7) as prompts to:
@@ -446,3 +446,4 @@ By following this framework, you can incrementally build a library of well
 structured CivicTheme upgrade specifications, task lists and playbooks that
 support both AI coding assistants and human developers without mixing planning
 and execution in the same document.
+

@@ -10,7 +10,7 @@ When you want to plan or execute a CivicTheme upgrade in a destination
 Drupal project, start here:
 
 1. **Read the framework**
-   - Skim `docs/planning.md` for the global CivicTheme upgrade
+   - Skim `docs/civic-theme-upgrades/planning.md` for the global CivicTheme upgrade
      documentation framework and governance.
    - Check `.specify/memory/constitution.md` for any additional global
      rules that apply to AI tooling and documentation.
@@ -46,8 +46,8 @@ Drupal project, start here:
    - Use `v1.10.0-to-v1.11.0` as a concrete reference for the
      `spec.md` / `tasks.md` / `playbook.md` / `planning.md` layout.
    - Populate `spec.md`, `tasks.md` and `playbook.md` using the
-     templates and guidance in `docs/planning.md` Section “How to
-     create a new per version spec, tasks and playbook”.
+     templates and guidance in `docs/civic-theme-upgrades/planning.md` Section "How to
+     create a new per version spec, tasks and playbook".
 
 Once the relevant version directory is present, all day-to-day work for
 that upgrade happens inside that directory.
@@ -97,7 +97,7 @@ For **all** such directories:
     reflected in the spec/tasks/playbook trio.
 
 These roles are enforced by the CivicTheme Upgrade Assistant
-constitution and the framework in `docs/planning.md`. Do **not** repurpose
+constitution and the framework in `docs/civic-theme-upgrades/planning.md`. Do **not** repurpose
 these files for unrelated documentation.
 
 ## 3. Guidance for AI coding assistants
@@ -107,7 +107,7 @@ this framework, AI coding assistants SHOULD follow these rules:
 
 1. **Start at the right level**
    - For global understanding, read:
-     - `docs/planning.md`
+     - `docs/civic-theme-upgrades/planning.md`
      - `.specify/memory/constitution.md`
    - For a specific upgrade, work from the relevant directory under
      `docs/civic-theme-upgrades/versions/`.
@@ -132,7 +132,7 @@ this framework, AI coding assistants SHOULD follow these rules:
      directory per step and repeat the spec → tasks → playbook pattern.
 
 5. **Planning files are not runtime dependencies**
-   - `docs/planning.md` and any `planning.md` inside version
+   - `docs/civic-theme-upgrades/planning.md` and any `planning.md` inside version
      directories are helpful for orientation, but AI tooling MUST be
      able to operate using only:
      - the per-version `spec.md`, `tasks.md`, `playbook.md`, and
