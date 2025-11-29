@@ -33,10 +33,11 @@ Drupal project, start here:
        vX.Y.Z-to-vA.B.C/
      ```
 
-   - In this repository, the first canonical step is:
+   - In this repository, the documented upgrade steps are:
 
      ```text
-     docs/civic-theme-upgrades/versions/v1.10.0-to-v1.11.0/
+     docs/civic-theme-upgrades/versions/v1.10.0-to-v1.11.0/  # SDC migration
+     docs/civic-theme-upgrades/versions/v1.11.0-to-v1.12.0/  # Security release
      ```
 
 4. **If the version directory does not exist yet**
