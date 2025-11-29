@@ -37,8 +37,8 @@ destination project:
 ```text
 docs/
   civic-theme-upgrades/
-    framework/
-      civic-theme-upgrade-framework.md      # Global framework, not version specific
+    customisations.md                       # Canonical customisation register
+    README.md                               # Entry point and guidance
     versions/
       vX.Y.Z-to-vA.B.C/                     # Example: v1.5.0-to-v1.6.0
         spec.md                             # Per-version upgrade specification (planning & analysis)
@@ -48,11 +48,11 @@ docs/
         spec.md
         tasks.md
         playbook.md
+  planning.md                               # Global framework (this document)
 ```
 
 Notes:
-- `civic-theme-upgrade-framework.md` is the global framework that you are
-  reading now.
+- `docs/planning.md` is the global framework that you are reading now.
 - Each destination project MUST maintain a persistent "CivicTheme customisation
   register" at the canonical path `docs/civic-theme-upgrades/customisations.md`
   so that both humans and AI coding assistants can reliably find it.

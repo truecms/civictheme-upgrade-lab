@@ -57,7 +57,7 @@ This is the simplest way to “vendor” the documentation into an existing repo
    ```sh
    mkdir -p tools
    cd tools
-   git clone <this-repo-url> civictheme-upgrade-assistant
+   git clone https://github.com/truecms/civictheme-upgrade-lab.git civictheme-upgrade-assistant
    ```
 
 2. Your project will now contain:
