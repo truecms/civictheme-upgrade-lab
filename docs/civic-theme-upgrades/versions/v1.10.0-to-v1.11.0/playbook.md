@@ -104,6 +104,5 @@ Related tasks: T100, T120
    - Open a merge request or equivalent, referencing this directory and
      highlighting any risks or remaining issues for reviewers.
 
-This completes the runbook for the CivicTheme `1.10.0` → `1.11.0` example
-upgrade step.
-
+This completes the runbook for the CivicTheme `1.10.0` → `1.11.0` upgrade
+step in this repository.

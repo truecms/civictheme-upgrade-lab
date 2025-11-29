@@ -8,6 +8,11 @@ This document defines a reusable framework for writing CivicTheme upgrade specif
 - It is intended to be copied and adapted when you create **per version** upgrade specifications.
 - Any version numbers used in this framework (for example `1.5.0`, `1.9.0`, `1.12.1`) are **examples only**.
 - Real upgrade steps, commands and decisions will be written later in separate files that follow this framework.
+- It is a governance and planning document primarily for human maintainers;
+  AI coding assistants MUST NOT depend on this file existing at run time
+  and SHOULD instead rely on per-version `spec.md` / `tasks.md` /
+  `playbook.md` files and the feature specification
+  `specs/001-rely-contents-docs/spec.md`.
 
 ## 2. Audience
 
@@ -54,6 +59,9 @@ Notes:
 - Each real upgrade lives in its own directory under `versions/`, for example:
   - `docs/civic-theme-upgrades/versions/v1.5.0-to-v1.6.0/spec.md`
   - `docs/civic-theme-upgrades/versions/v1.9.0-to-v1.10.0/spec.md`
+  In this repository, the first canonical per-version step is implemented at
+  `docs/civic-theme-upgrades/versions/v1.10.0-to-v1.11.0/`, which provides a
+  real specification, task list and playbook for that upgrade path.
 - For each version range directory:
   - `spec.md` captures planning, analysis, upstream references, project
     context and customisation inventory view.
@@ -424,6 +432,15 @@ It is important to keep the following separation clear:
     actual upgrade.
   - May be generated or heavily assisted by AI using `spec.md` and `tasks.md`
     as context.
+
+In summary for each per-version directory:
+
+- `spec.md` focuses on **what and why** (context, upstream changes, risks,
+  customisations, success criteria).
+- `tasks.md` is the **checklist** (concrete, tickable items derived from the
+  spec).
+- `playbook.md` describes **how** (ordered execution/runbook implementing
+  those tasks in a safe environment).
 
 By following this framework, you can incrementally build a library of well
 structured CivicTheme upgrade specifications, task lists and playbooks that
