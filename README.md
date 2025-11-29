@@ -24,8 +24,7 @@ Nothing in this repository should be interpreted as official CivicTheme guidance
   - `planning.md` – optional scratchpad for planning (never the source of truth).
 - A global `docs/civic-theme-upgrades/customisations.md` file acting as a **customisation register** for your CivicTheme sub‑theme and project‑specific overrides.
 - Global planning and governance docs in:
-  - `.specify/memory/constitution.md` – framework "constitution" and guardrails.
-  - `docs/civic-theme-upgrades/planning.md` – how this assistant expects specs/tasks/playbooks to be structured.
+  - `docs/civic-theme-upgrades/planning.md` – how this assistant expects `spec.md`, `tasks.md` and `playbook.md` to be structured.
 
 Downstream projects are expected to adapt and extend these documents rather than treat them as generated code.
 
@@ -37,10 +36,8 @@ You typically add this framework **into an existing Drupal project that already 
 
 1. Open this repository in your Git hosting UI and choose “Download ZIP”.
 2. Extract the archive somewhere outside your project.
-3. From the extracted folder, copy at minimum:
+3. From the extracted folder, copy:
    - `docs/civic-theme-upgrades/` → into your project's `docs/` directory (create `docs/` if it does not exist).
-   - Optionally, also copy:
-     - `.specify/` and `specs/` (if you want the full planning framework and examples).
 4. After copying, your project will contain, for example:
    - `docs/civic-theme-upgrades/README.md`
    - `docs/civic-theme-upgrades/customisations.md`
@@ -61,7 +58,6 @@ This is the simplest way to “vendor” the documentation into an existing repo
 
 2. Your project will now contain:
    - `tools/civictheme-upgrade-assistant/docs/civic-theme-upgrades/`
-   - `tools/civictheme-upgrade-assistant/.specify/` and `specs/` (internal to the framework).
 3. Decide how you want to expose the upgrade docs:
    - Either **reference them in place** (for example, point developers and AI assistants at `tools/civictheme-upgrade-assistant/docs/civic-theme-upgrades/`), or
    - Copy or symlink `tools/civictheme-upgrade-assistant/docs/civic-theme-upgrades/` into your main `docs/` directory so the canonical path in your project becomes `docs/civic-theme-upgrades/…`.

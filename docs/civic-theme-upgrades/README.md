@@ -12,8 +12,6 @@ Drupal project, start here:
 1. **Read the framework**
    - Skim `docs/civic-theme-upgrades/planning.md` for the global CivicTheme upgrade
      documentation framework and governance.
-   - Check `.specify/memory/constitution.md` for any additional global
-     rules that apply to AI tooling and documentation.
 
 2. **Locate or create the customisation register**
    - Ensure `docs/civic-theme-upgrades/customisations.md` exists.
@@ -96,8 +94,7 @@ For **all** such directories:
   - **Not** a source of truth: once decisions are made, they must be
     reflected in the spec/tasks/playbook trio.
 
-These roles are enforced by the CivicTheme Upgrade Assistant
-constitution and the framework in `docs/civic-theme-upgrades/planning.md`. Do **not** repurpose
+These roles are enforced by the framework in `docs/civic-theme-upgrades/planning.md`. Do **not** repurpose
 these files for unrelated documentation.
 
 ## 3. Guidance for AI coding assistants
@@ -106,9 +103,7 @@ When operating in this repository or in a downstream project that adopts
 this framework, AI coding assistants SHOULD follow these rules:
 
 1. **Start at the right level**
-   - For global understanding, read:
-     - `docs/civic-theme-upgrades/planning.md`
-     - `.specify/memory/constitution.md`
+   - For global understanding, read `docs/civic-theme-upgrades/planning.md`.
    - For a specific upgrade, work from the relevant directory under
      `docs/civic-theme-upgrades/versions/`.
 

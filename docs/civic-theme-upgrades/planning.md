@@ -11,8 +11,7 @@ This document defines a reusable framework for writing CivicTheme upgrade specif
 - It is a governance and planning document primarily for developers;
   AI coding assistants MUST NOT depend on this file existing at run time
   and SHOULD instead rely on per-version `spec.md` / `tasks.md` /
-  `playbook.md` files and the feature specification
-  `specs/001-rely-contents-docs/spec.md`.
+  `playbook.md` files.
 
 ## 2. Audience
 
