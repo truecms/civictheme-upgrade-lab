@@ -708,7 +708,8 @@ credentials.
 
 ```bash
 # Remove the API key line from .env
-sed -i '' '/ANTHROPIC_API_KEY/d' .env
+# Cross-platform sed: works on both BSD (macOS) and GNU (Linux) sed
+sed -i.bak '/ANTHROPIC_API_KEY/d' .env && rm -f .env.bak
 
 # Verify removal
 grep -i "ANTHROPIC_API_KEY" .env
@@ -722,7 +723,9 @@ grep -i "ANTHROPIC_API_KEY" .env
 unset ANTHROPIC_API_KEY
 
 # If added to shell config, remove the export line
-sed -i '' '/ANTHROPIC_API_KEY/d' ~/.bashrc  # or ~/.zshrc
+# Cross-platform sed: works on both BSD (macOS) and GNU (Linux) sed
+# Replace ~/.bashrc with ~/.zshrc if using zsh
+sed -i.bak '/ANTHROPIC_API_KEY/d' ~/.bashrc && rm -f ~/.bashrc.bak
 source ~/.bashrc  # or source ~/.zshrc
 ```
 
