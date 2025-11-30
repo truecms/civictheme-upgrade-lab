@@ -722,6 +722,44 @@ CivicTheme test suite for examples.
 
 ---
 
+## 8. References
+
+This section provides links to official upstream resources for the CivicTheme `1.11.0 → 1.12.0` upgrade.
+
+### Release information
+
+- **CivicTheme 1.11.0 release notes** (source version):  
+  https://www.drupal.org/project/civictheme/releases/1.11.0
+- **CivicTheme 1.12.0 release notes** (target version):  
+  https://www.drupal.org/project/civictheme/releases/1.12.0
+- **CivicTheme documentation portal**:  
+  https://docs.civictheme.io/changelog
+
+### Code comparison
+
+- **Git diff** (1.11.0 → 1.12.0):  
+  https://git.drupalcode.org/project/civictheme/-/compare/1.11.0...1.12.0?from_project_id=86817
+
+### Upgrade tools and resources
+
+- **CivicTheme Upgrade Tools** (optional helper scripts):  
+  https://github.com/civictheme/upgrade-tools/blob/main/README.md
+- **CivicTheme Drupal.org project page**:  
+  https://www.drupal.org/project/civictheme
+- **CivicTheme main website**:  
+  https://civictheme.io
+
+### Security advisories
+
+- **SA-CONTRIB-2025-112** (Information disclosure – Moderately critical):  
+  https://www.drupal.org/sa-contrib-2025-112
+- **SA-CONTRIB-2025-113** (Cross-site Scripting – Moderately critical):  
+  https://www.drupal.org/sa-contrib-2025-113
+- **Security advisories index**:  
+  https://www.drupal.org/security/contrib
+
+---
+
 ## 9. Developer review checklist
 
 Before considering the 1.11.0 → 1.12.0 upgrade complete, a developer

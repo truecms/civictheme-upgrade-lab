@@ -602,7 +602,48 @@ When assisting with this upgrade, AI models SHOULD:
 
 ---
 
-## 8. Developer review checklist
+## 8. References
+
+This section provides links to official upstream resources for the CivicTheme `1.10.0 → 1.11.0` upgrade.
+
+### Release information
+
+- **CivicTheme 1.10.0 release notes** (source version):  
+  https://www.drupal.org/project/civictheme/releases/1.10.0
+- **CivicTheme 1.11.0 release notes** (target version):  
+  https://www.drupal.org/project/civictheme/releases/1.11.0
+- **CivicTheme documentation portal**:  
+  https://docs.civictheme.io/changelog
+
+### Code comparison
+
+- **Git diff** (1.10.0 → 1.11.0):  
+  https://git.drupalcode.org/project/civictheme/-/compare/1.10.0...1.11.0?from_project_id=86817
+
+### Upgrade tools and resources
+
+- **CivicTheme Upgrade Tools** (SDC update script and other helpers):  
+  https://github.com/civictheme/upgrade-tools/blob/main/README.md
+- **CivicTheme Drupal.org project page**:  
+  https://www.drupal.org/project/civictheme
+- **CivicTheme main website**:  
+  https://civictheme.io
+
+### Single Directory Components (SDC) resources
+
+- **Drupal SDC documentation**:  
+  https://www.drupal.org/docs/core-modules-and-themes/core-modules/sdc-module
+- **CivicTheme SDC guidance**:  
+  See relevant sections under https://docs.civictheme.io
+
+### Security advisories
+
+- **Security advisories index**:  
+  https://www.drupal.org/security/contrib
+
+---
+
+## 9. Developer review checklist
 
 Before considering the 1.10.0 → 1.11.0 upgrade complete, a developer
 SHOULD confirm:
