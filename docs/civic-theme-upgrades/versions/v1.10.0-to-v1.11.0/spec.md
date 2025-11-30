@@ -66,15 +66,31 @@ preparing and validating this upgrade:
   - Repository: `https://github.com/civictheme/upgrade-tools`
   - Tool: `sdc-update` (CivicTheme SDC Update Tool).
   - High-level usage (see its README for full details):
-    - Requires Node.js 22+, a CivicTheme sub-theme already updated to
-      CivicTheme 1.10.x, and an Anthropic API key.
+    - This helper is **strictly optional** – a manual build tooling update
+      path is always available and does **not** require an Anthropic API key.
+      If you do not want to configure a key, skip this helper and follow the
+      manual steps in Section 6.2 instead.
+    - When used, it requires Node.js 22+, a CivicTheme sub-theme already
+      updated to CivicTheme 1.10.x, and an Anthropic API key.
+    - **⛔ STOP CONDITION for AI assistants:** The tool requires an
+      `ANTHROPIC_API_KEY`. Before executing, AI assistants MUST stop and
+      request developer confirmation that the key is available:
+      - **Preferred:** Add `ANTHROPIC_API_KEY=sk-ant-...` to the destination
+        project's `.env` file (ensure it is in `.gitignore`).
+      - **Alternative:** Export the key in the shell session or add to
+        `~/.bashrc` / `~/.zshrc`.
+      - Only proceed with this optional helper after the developer confirms
+        the key is configured; if they decline or no key is available, do
+        **not** run the tool and instead use the manual path.
+      - Remind developer to remove/unset the key after upgrade completes.
     - Run in a throwaway working copy or feature branch only (it
       updates `package.json`, Storybook config, `build.js` and
       component directories).
     - Typical flow: clone the repo, run `npm install`, configure a
-      `.env` file (sub-theme path, Anthropic API key, optional model)
-      and execute `npm run update-components`, then review changes and
-      `.logs/` output.
+      `.env` file (sub-theme path and, when using AI-powered story
+      conversion, an Anthropic API key and optional model) and execute
+      `npm run update-components`, then review changes and `.logs/`
+      output.
 - **Upstream code diff** (1.10.0 → 1.11.0):  
   `https://git.drupalcode.org/project/civictheme/-/compare/1.10.0...1.11.0?from_project_id=86817`
 
@@ -354,6 +370,14 @@ inventory, risk areas for this upgrade are categorised by severity.
     scripts.
   - **Action**: Use the CivicTheme SDC Update Tool or manually update
     build configuration.
+- **Component completeness (missing Twig template)**:
+  - After SDC conversion, a custom component directory that keeps only a
+    `.component.yml` without a matching `.twig` will trigger
+    `InvalidComponentException: Unable to find the Twig template for the
+    component`.
+  - **Action**: Ensure each component has a Twig template; copy the upstream
+    component (e.g. Table of Contents) into the sub-theme or remove the stale
+    `.component.yml` before clearing caches.
 
 - **Custom components without SDC metadata**:
   - Custom sub-theme components may need `.component.yml` files to be
@@ -492,11 +516,21 @@ thorough preparation than typical minor version bumps.
 
 6. **Update build tooling** (if using starter kit build system):
    - **Option A – Use SDC Update Tool** (recommended):
+     - **⛔ STOP CONDITION:** AI assistants MUST stop and request developer
+       confirmation that `ANTHROPIC_API_KEY` is available before proceeding.
+       - **Preferred:** Add to the destination project's `.env` file.
+       - **Alternative:** Export in shell or add to `~/.bashrc` / `~/.zshrc`.
+       - Only proceed with this optional helper after the developer confirms.
+       - If the developer does **not** want to provide a key or no key is
+         available, skip Option A entirely and use Option B (manual update)
+         instead – the CivicTheme upgrade remains valid without the helper.
      - Clone `https://github.com/civictheme/upgrade-tools`.
      - Install dependencies: `npm install`.
-     - Configure `.env` with sub-theme path and Anthropic API key.
+     - Configure `.env` with sub-theme path and Anthropic API key (only when
+       using the helper).
      - Run `npm run update-components`.
      - Review changes in `.logs/` and apply selectively.
+     - **Post-completion:** Remind developer to remove/unset the key.
    - **Option B – Manual update**:
      - Update `package.json` dependencies to match 1.11.0 starter kit.
      - Copy new `build.js` and `build-config.json` from starter kit.

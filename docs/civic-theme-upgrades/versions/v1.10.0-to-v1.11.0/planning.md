@@ -45,6 +45,10 @@ minor version bump – it requires significant sub-theme updates.
 - [ ] Database and file backups exist.
 - [ ] Dedicated feature branch created.
 - [ ] Drupal core is `>=10.2` (prerequisite).
+- [ ] (Optional) Anthropic API key available **only if** you plan to use the
+  CivicTheme upgrade-tools helper for Storybook story conversion (T116a). See
+  Section 3 for configuration instructions; otherwise you may proceed with the
+  manual build tooling path.
 
 ### Recommended task order
 
@@ -52,6 +56,8 @@ minor version bump – it requires significant sub-theme updates.
    - Verify Drupal core compatibility.
    - Audit all sub-theme templates for breaking patterns.
    - Document customisation impact.
+   - Capture current custom library attachments (libraries.yml entries and
+     Twig/`#attached` usages) in the table below before touching code.
 
 2. **High-priority changes** (will cause immediate breakage):
    - Update Composer dependencies.
@@ -83,6 +89,60 @@ the playbook.)*
 ---
 
 ## 3. Open questions / risks
+
+### ⛔ STOP CONDITION – Anthropic API Key
+
+The CivicTheme upgrade-tools (storybook-v8-update / sdc-update) require an
+`ANTHROPIC_API_KEY` to convert Storybook stories via the Claude API.
+
+**AI assistants MUST stop and request developer confirmation before proceeding
+with the upgrade-tools.**
+
+**Important:** These upgrade-tools are an **optional helper only**. If the
+developer prefers not to configure an Anthropic API key, simply skip the tools
+and use the manual build tooling path (T116b). The overall CivicTheme upgrade
+can continue without an Anthropic key.
+
+**Configuration options (choose one):**
+
+1. **Preferred – Destination project `.env` file:**
+
+   ```bash
+   # In the destination project root directory
+   echo 'ANTHROPIC_API_KEY=sk-ant-...' >> .env
+   ```
+
+   Ensure `.env` is listed in `.gitignore`.
+
+2. **Alternative – Shell environment:**
+
+   ```bash
+   # Add to ~/.bashrc or ~/.zshrc
+   export ANTHROPIC_API_KEY=sk-ant-...
+   ```
+
+   Then run `source ~/.bashrc` (or `source ~/.zshrc`).
+
+**Developer confirmation checklist:**
+
+- [ ] `ANTHROPIC_API_KEY` added to `.env` file (preferred)
+- [ ] `ANTHROPIC_API_KEY` exported in shell / shell config (alternative)
+
+**⚠️ Security reminder:** Remove the key after upgrade completion:
+- Delete the line from `.env`, or
+- Run `unset ANTHROPIC_API_KEY` in your shell.
+
+---
+
+### Pre-upgrade capture: custom library attachments
+
+| Library | Files referenced | Where attached (Twig/preprocess) | Notes |
+|---------|------------------|-----------------------------------|-------|
+| (fill)  |                  |                                   |       |
+
+Use this table during T103e to list every custom sub-theme library and its
+attach points so they can be restored after the upgrade if overrides are
+lost.
 
 ### Resolved
 
@@ -141,4 +201,3 @@ Record key decisions made during planning:
 
 Once tasks are stable, ensure they are recorded in `tasks.md` with clear IDs
 and that `playbook.md` is updated to reflect the agreed execution order.
-

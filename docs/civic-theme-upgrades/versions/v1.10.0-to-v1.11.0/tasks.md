@@ -97,6 +97,13 @@ They are intended to be adapted per project; IDs here are examples.
     kit version.
   - **T103d**: Check `package.json` for `@civictheme/sdc` dependency
     (should be added for 1.11.0).
+  - **T103e [P]**: Capture custom library attachments **before any upgrade changes**:
+    - Grep for `attach_library` in Twig and `#attached` in preprocess/hooks to
+      list custom sub-theme libraries (e.g. `sts/event-page`, `component.*`).
+    - Grep `<subtheme>.libraries.yml` for custom library names.
+    - Record findings (library name, file path, attach location) in
+      `planning.md` under a dedicated table so they can be restored after the
+      upgrade.
 
 - [ ] T104 Map findings to customisation register
   - For each finding in T102 and T103:
@@ -197,19 +204,42 @@ They are intended to be adapted per project; IDs here are examples.
       css:
         theme:
           dist/styles.variables.css: { preprocess: false, weight: 10 }
+
+- [ ] T115a Restore custom library attachments captured in `planning.md`
+  - Re-add any custom libraries removed or renamed during the upgrade to
+    `<subtheme>.libraries.yml` and related Twig/preprocess attaches.
+  - Validate that each captured attach point still loads after cache clear.
     ```
 
 - [ ] T116 Update build tooling (choose one approach)
-  - **T116a – Use SDC Update Tool** (recommended):
-    - Confirm prerequisites: Node.js 22+, Anthropic API key.
-        - Clone `https://github.com/civictheme/upgrade-tools`.
-    - Run `npm install` in the cloned repo.
-    - Create `.env` with:
-      - `SUBTHEME_PATH=/absolute/path/to/subtheme`
-      - `ANTHROPIC_API_KEY=your-api-key`
-    - Run `npm run update-components`.
-    - Review `.logs/` output for errors.
-    - Review Git diff of sub-theme changes before committing.
+  - **T116a – Use CivicTheme upgrade-tools (storybook-v8-update / sdc-update)**
+    - Prereqs for this optional helper: Node.js 22+ and an Anthropic API key.
+      If you prefer not to provide a key, skip T116a and complete T116b
+      (manual update) instead – the upgrade remains valid.
+    - **⛔ STOP CONDITION – Anthropic API Key Required**
+      - AI assistants MUST stop and request developer action before proceeding.
+      - The story conversion script requires `ANTHROPIC_API_KEY` to call the
+        Anthropic Claude API.
+      - **Preferred:** Add `ANTHROPIC_API_KEY=sk-ant-...` to the destination
+        project's `.env` file (ensure `.env` is in `.gitignore`).
+      - **Alternative:** Export in shell session or add to `~/.bashrc` /
+        `~/.zshrc` and source the file.
+      - Wait for developer to confirm key is available before proceeding; if
+        they do not confirm or decline to provide a key, do **not** run T116a
+        and instead follow T116b.
+      - **Security:** Remind developer to remove/unset the key after upgrade.
+    - Clone tools: `git clone https://github.com/civictheme/upgrade-tools.git`.
+    - `cd upgrade-tools/storybook-v8-update && npm install`.
+    - Update build + Storybook: `SUBTHEME_DIRECTORY=/abs/path/to/subtheme ./scripts/update-build-and-storybook.sh`.
+    - (Optional) Convert stories: `SUBTHEME_DIRECTORY=/abs/path/to/subtheme ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY node -e "import('./scripts/convert-subtheme-storybook.mjs').then(m=>m.default())"`.
+    - Common issues/workarounds:
+      - Model unavailable → set `model` inside `convert-subtheme-storybook.mjs` to an available Anthropic model (e.g. `claude-sonnet-4-5-20250929`).
+      - Missing sass-embedded binary → install optional `sass-embedded-*` packages or temporarily set `build.js` to use `sass`.
+      - Wrong `civicthemePath` after script → update `build-config.json` to point to contrib Civictheme directory (e.g. `../contrib/civictheme`).
+      - Interactive prompt failure → run the direct script commands above instead of `npm run update-storybook`.
+    - Review `.logs/` output and git diff before committing.
+    - **Post-completion:** Remove `ANTHROPIC_API_KEY` from `.env` or unset from
+      shell environment.
   - **T116b – Manual update**:
     - Copy `build.js` from CivicTheme 1.11.0 starter kit.
     - Copy `build-config.json` from starter kit.

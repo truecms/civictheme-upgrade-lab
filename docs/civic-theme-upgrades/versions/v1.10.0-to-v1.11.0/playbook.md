@@ -258,9 +258,126 @@ fi
 # T103d: Check package.json for SDC dependency
 echo "=== Package.json dependencies ==="
 grep "@civictheme" $SUBTHEME_PATH/package.json 2>/dev/null || echo "No @civictheme deps found"
+
+# T103e: Capture custom library attachments (record in planning.md)
+echo "=== Custom attach_library / #attached usage ==="
+grep -rn "attach_library" $SUBTHEME_PATH/templates/ $SUBTHEME_PATH | head -100
+grep -rn "#attached" $SUBTHEME_PATH | head -100
+echo "=== Custom libraries defined ==="
+grep -E "^[A-Za-z0-9_.-]+:" $SUBTHEME_PATH/*.libraries.yml | head -50
+
+# Record the library name, file path, and attach location in
+# docs/civic-theme-upgrades/versions/v1.10.0-to-v1.11.0/planning.md so they
+# can be restored after the upgrade.
 ```
 
-### 2.4 Document findings (T104)
+### 2.4 Use CivicTheme upgrade-tools (optional helper) (T116a)
+
+The CivicTheme upgrade-tools repository includes `storybook-v8-update`/`sdc-update`
+helpers that can refresh build tooling (Vite/Storybook v8) and convert
+Storybook stories to the controls API. These steps are intentionally generic so
+they can be reused across projects.
+
+**Prerequisites**
+
+- Node.js ≥ 22
+- **Anthropic API key** (required only if you choose to use this helper;
+  see STOP CONDITION below)
+- Clean working copy or feature branch (the tool rewrites `package.json`,
+  `.storybook`, `build.js`, component stories)
+
+---
+
+#### ⛔ STOP CONDITION – Anthropic API Key Required
+
+**AI assistants MUST stop here and request developer action** before proceeding
+with the upgrade-tools. The Storybook story conversion script requires an
+`ANTHROPIC_API_KEY` to call the Anthropic Claude API.
+
+These upgrade-tools are **optional**. If the developer does not wish to
+configure an Anthropic API key, skip Section 2.4 entirely and rely on the
+manual build tooling updates in Section 3.8 (Option B). The upgrade can
+proceed without the key.
+
+**Action required from developer:**
+
+1. **Preferred method** – Add the key to the destination project's `.env` file
+   (create the file if it does not exist):
+
+   ```bash
+   # In the destination project root directory
+   echo 'ANTHROPIC_API_KEY=sk-ant-...' >> .env
+   ```
+
+   Ensure `.env` is listed in `.gitignore` (it typically is in Drupal projects).
+
+2. **Alternative method** – Export the key in your shell session or shell
+   configuration file (`~/.bashrc`, `~/.zshrc`):
+
+   ```bash
+   export ANTHROPIC_API_KEY=sk-ant-...
+   ```
+
+   If added to a shell configuration file, run `source ~/.bashrc` (or
+   `source ~/.zshrc`) to load the new value.
+
+**⚠️ Security reminder:** The Anthropic API key is a secret credential.
+- Do NOT commit it to version control.
+- Remove or unset the key after the upgrade is complete.
+
+---
+
+**Developer confirmation required:**
+
+> Please confirm how the `ANTHROPIC_API_KEY` has been added:
+>
+> - [ ] Added to `.env` file in the destination project (preferred)
+> - [ ] Exported in shell session / shell configuration file
+>
+> Once confirmed, the AI assistant may proceed with the upgrade-tools
+> execution. If neither option is selected (no key configured), do **not**
+> run the upgrade-tools; continue with the manual build tooling steps instead.
+
+---
+
+**Execution (non-interactive recommended)**
+
+```bash
+# 1) Clone tools (or reuse an existing checkout)
+git clone https://github.com/civictheme/upgrade-tools.git /tmp/civictheme-upgrade-tools
+cd /tmp/civictheme-upgrade-tools/storybook-v8-update
+
+# 2) Install dependencies
+npm install
+
+# 3) Update build + Storybook configs for your sub-theme
+SUBTHEME_DIRECTORY=/absolute/path/to/your/subtheme \
+  ./scripts/update-build-and-storybook.sh
+
+# 4) (Optional) Convert Storybook stories using AI
+SUBTHEME_DIRECTORY=/absolute/path/to/your/subtheme \
+ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY \
+node -e "import('./scripts/convert-subtheme-storybook.mjs').then(m => m.default())"
+```
+
+**Observed issues and workarounds**
+
+- *Model not found / unsupported*: Edit `scripts/convert-subtheme-storybook.mjs`
+  and set `model` to an available Anthropic model (e.g.
+  `claude-sonnet-4-5-20250929`).
+- *Sass embedded binary missing*: Install optional platform-specific
+  `sass-embedded-*` packages or temporarily switch `build.js` to use `sass`
+  instead of `sass-embedded` and rerun the build.
+- *CivicTheme path detection wrong*: After the tool runs, ensure
+  `build-config.json` points to the contrib Civictheme directory (e.g.
+  `../contrib/civictheme`). If overwritten, restore the correct path before
+  building.
+- *Interactive menu crashes*: Use the direct script invocation above instead of
+  the interactive `npm run update-storybook` prompt.
+- *Story diffs*: Manually review converted stories—long/complex stories may
+  need hand edits.
+
+### 2.5 Document findings (T104)
 
 Update the customisation register with:
 - List of templates requiring include syntax updates.
@@ -434,9 +551,60 @@ css-variables:
       dist/styles.variables.css: { preprocess: false, weight: 10 }
 ```
 
-### 3.7 Update build tooling (T116)
+### 3.7 Restore custom library attachments (T115a)
+
+Use the table you wrote in `planning.md` during T103e to re-attach any
+custom libraries that were previously loading bespoke CSS/JS:
+
+- Re-add the libraries to `<subtheme>.libraries.yml` if they were removed or
+  renamed.
+- Restore `attach_library()` calls (Twig) or `#attached` entries
+  (preprocess/hooks) where they originally loaded.
+- Clear caches and spot-check pages that rely on those libraries (events,
+  workshop filters, feedback blocks, etc.).
+
+### 3.8 Update build tooling (T116)
 
 **Option A – Use SDC Update Tool** (recommended):
+
+---
+
+#### ⛔ STOP CONDITION – Anthropic API Key Required
+
+**AI assistants MUST stop here if the `ANTHROPIC_API_KEY` has not been
+configured.** This tool requires the key to convert Storybook stories via the
+Anthropic Claude API.
+
+If you have not yet configured the key (or skipped Section 2.4), request
+developer confirmation now:
+
+**Note:** Option A is an **optional helper**. If the developer prefers not to
+configure an Anthropic API key, skip Option A and proceed directly to
+**Option B – Manual update** below. The CivicTheme upgrade can continue
+without the key.
+
+**Action required from developer:**
+
+1. **Preferred method** – Add to the destination project's `.env` file:
+
+   ```bash
+   echo 'ANTHROPIC_API_KEY=sk-ant-...' >> .env
+   ```
+
+2. **Alternative method** – Export in your shell session or add to
+   `~/.bashrc` / `~/.zshrc`:
+
+   ```bash
+   export ANTHROPIC_API_KEY=sk-ant-...
+   ```
+
+**Developer confirmation required before proceeding:**
+
+> - [ ] `ANTHROPIC_API_KEY` is available (in `.env` or exported in shell)
+>
+> Once confirmed, the AI assistant may proceed.
+
+---
 
 ```bash
 # Clone the upgrade tools repo
@@ -447,10 +615,10 @@ cd upgrade-tools/sdc-update
 # Install dependencies
 npm install
 
-# Create .env file
+# Create .env file for the tool (copy key from project .env or shell)
 cat > .env << EOF
 SUBTHEME_PATH=/absolute/path/to/your/subtheme
-ANTHROPIC_API_KEY=your-anthropic-api-key
+ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY
 EOF
 
 # Run the update
@@ -463,6 +631,10 @@ ls -la .logs/
 cd /path/to/your/subtheme
 git diff
 ```
+
+**Post-completion reminder:** Once the upgrade is complete, remove the
+`ANTHROPIC_API_KEY` from the destination project's `.env` file or unset it
+from your shell environment (`unset ANTHROPIC_API_KEY`).
 
 **Option B – Manual update**:
 
@@ -486,7 +658,7 @@ git diff
 
 3. Update `.storybook/preview.js` to match starter kit.
 
-### 3.8 Add SDC prop schema enforcement (T117) – Optional
+### 3.9 Add SDC prop schema enforcement (T117) – Optional
 
 Add to `<subtheme>.info.yml`:
 
@@ -496,7 +668,7 @@ enforce_prop_schemas: true
 
 This enables validation of component props against schemas.
 
-### 3.9 Rebuild sub-theme assets
+### 3.10 Rebuild sub-theme assets
 
 ```bash
 # RECOMMENDED: Using ahoy fe (equivalent to npm run build from theme directory)
@@ -525,6 +697,22 @@ git status  # Review all changes
 # Commit in logical chunks if preferred
 git commit -m "feat: Updated sub-theme for CivicTheme 1.11 SDC migration"
 ```
+
+### 3.11 Known issues and workarounds
+
+- **InvalidComponentException: Unable to find Twig template for component** —
+  can occur if a custom component directory contains a `.component.yml` but no
+  matching `.twig` after SDC conversion (e.g. custom Table of Contents). Fix by
+  adding the missing Twig template (copy upstream component if needed) or
+  removing the stale `.component.yml`, then clear caches (`drush cr`).
+- **Sass embedded binary missing** — install optional `sass-embedded-<platform>`
+  packages or temporarily point `build.js` to `sass` and rerun the build.
+- **Story conversion model unavailable** — set `model` in
+  `scripts/convert-subtheme-storybook.mjs` to an available Anthropic model
+  (e.g. `claude-sonnet-4-5-20250929`).
+- **Wrong CivicTheme path in build-config** — ensure `build-config.json`
+  `civicthemePath` points to the contrib Civictheme directory after running
+  upgrade-tools.
 
 ---
 
@@ -818,7 +1006,8 @@ to Single Directory Components (SDC).
 - [ ] Storybook builds successfully
 
 ### Known Issues / Follow-ups
-- [List any remaining issues]
+- CivicTheme 1.11 splits CSS by component and no longer bundles custom component styles into a single `styles.css`. Any bespoke Twig that renders custom markup (not an SDC component) can lose styling. Fix: add a theme library that points to the generated component CSS (e.g. `components_combined/05-pages/<component>/<component>.css`) and attach it in the Twig template, or restore a project-level bundle that imports those components. Example fix for events: add an `event-page` library pointing to `components_combined/05-pages/event/event.css` and call `attach_library('theme/event-page')` on the event node template.
+- Bespoke filter/banner components that layer custom markup over CivicTheme list backgrounds can lose styles after the 1.11 CSS split when their libraries ship JS only. Fix by bundling the compiled custom CSS together with any dependent CivicTheme CSS (for example, the list organism CSS) in the same library and ensuring the page keeps `attach_library()`/`#attached` calls so backgrounds and buttons stay styled.
 
 ### Documentation
 See `docs/civic-theme-upgrades/versions/v1.10.0-to-v1.11.0/` for full

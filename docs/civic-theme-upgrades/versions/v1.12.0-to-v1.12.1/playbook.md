@@ -134,11 +134,28 @@ date. For this release, focus on:
 - Any email handling customisations.
 - Any iframe paragraph customisations.
 
+### 2.4 Capture custom library attachments (T304)
+
+```bash
+SUBTHEME_PATH=/path/to/your/subtheme
+
+echo "=== attach_library / #attached usage ==="
+grep -rn "attach_library" $SUBTHEME_PATH/templates/ $SUBTHEME_PATH | head -100
+grep -rn "#attached" $SUBTHEME_PATH | head -100
+
+echo "=== Custom libraries defined ==="
+grep -E "^[A-Za-z0-9_.-]+:" $SUBTHEME_PATH/*.libraries.yml | head -50
+
+# Record library name, files, and attach locations in
+# docs/civic-theme-upgrades/versions/v1.12.0-to-v1.12.1/planning.md to restore
+# them after the upgrade if needed.
+```
+
 ---
 
 ## 3. Apply changes
 
-**Related tasks**: T310, T311, T312
+**Related tasks**: T310, T311, T312, T313
 
 ### 3.1 Upgrade CivicTheme via Composer (T310)
 
@@ -170,7 +187,17 @@ git add -A
 git commit -m "chore: Removed 1.12.0 WYSIWYG workarounds (fixed in 1.12.1)"
 ```
 
-### 3.3 Rebuild sub-theme assets (T312) – optional
+### 3.3 Restore custom library attachments (T313)
+
+Using the notes captured in `planning.md`, re-attach any custom libraries and
+their CSS/JS assets:
+
+- Re-add libraries to `<subtheme>.libraries.yml` if they were removed or
+  renamed.
+- Restore Twig `attach_library()` and preprocess `#attached` entries.
+- Clear caches and spot-check pages that rely on these libraries.
+
+### 3.4 Rebuild sub-theme assets (T312) – optional
 
 This step is optional but recommended to pick up the updated
 `@civictheme/sdc` 1.12.1 package:
@@ -188,7 +215,7 @@ npm run build
 ls -la $SUBTHEME_PATH/dist/
 ```
 
-### 3.4 Commit changes
+### 3.5 Commit changes
 
 ```bash
 git add -A
@@ -462,4 +489,3 @@ To enable email-to-link conversion in a custom text format:
 This completes the runbook for the CivicTheme `1.12.0` → `1.12.1` upgrade.
 For questions or issues, consult the upstream documentation at
 https://docs.civictheme.io/changelog
-
