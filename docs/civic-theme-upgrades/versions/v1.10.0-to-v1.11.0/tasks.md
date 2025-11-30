@@ -223,13 +223,14 @@ They are intended to be adapted per project; IDs here are examples.
       - The story conversion script requires `ANTHROPIC_API_KEY` to call the
         Anthropic Claude API.
       - **Preferred:** Add `ANTHROPIC_API_KEY=sk-ant-...` to the destination
-        project's `.env` file (ensure `.env` is in `.gitignore`).
+        project's `.env` file.
       - **Alternative:** Export in shell session or add to `~/.bashrc` /
         `~/.zshrc` and source the file.
       - Wait for developer to confirm key is available before proceeding; if
         they do not confirm or decline to provide a key, do **not** run T116a
         and instead follow T116b.
-      - **Security:** Remind developer to remove/unset the key after upgrade.
+      - **Security:** Remind developer to remove/unset the key after upgrade
+        (see T119 for removal task).
     - Clone tools: `git clone https://github.com/civictheme/upgrade-tools.git`.
     - `cd upgrade-tools/storybook-v8-update && npm install`.
     - Update build + Storybook: `SUBTHEME_DIRECTORY=/abs/path/to/subtheme ./scripts/update-build-and-storybook.sh`.
@@ -240,8 +241,7 @@ They are intended to be adapted per project; IDs here are examples.
       - Wrong `civicthemePath` after script → update `build-config.json` to point to contrib Civictheme directory (e.g. `../contrib/civictheme`).
       - Interactive prompt failure → run the direct script commands above instead of `npm run update-storybook`.
     - Review `.logs/` output and git diff before committing.
-    - **Post-completion:** Remove `ANTHROPIC_API_KEY` from `.env` or unset from
-      shell environment.
+    - **Post-completion:** See T119 for API key removal task.
   - **T116b – Manual update**:
     - Copy `build.js` from CivicTheme 1.11.0 starter kit.
     - Copy `build-config.json` from starter kit.
@@ -260,6 +260,18 @@ They are intended to be adapted per project; IDs here are examples.
   - If the project implements `hook_civictheme_automated_list_view_info_alter()`:
     - Update content type references (e.g. `'event'` → `'civictheme_event'`
       if using CivicTheme content types).
+
+- [ ] T119 [P] Remove Anthropic API key post-upgrade
+  - **Critical security task**: Ensure the `ANTHROPIC_API_KEY` is removed to
+    prevent accidental commit of sensitive credentials.
+  - **If added to `.env` file:**
+    - Open `.env` and remove the line containing `ANTHROPIC_API_KEY=sk-ant-...`.
+    - Verify the file no longer contains the key: `grep -i "ANTHROPIC_API_KEY" .env`
+    - Expected output: No matches (empty output).
+  - **If exported in shell:**
+    - Run `unset ANTHROPIC_API_KEY` to remove from current session.
+    - If added to `~/.bashrc` or `~/.zshrc`, remove the export line and source the file.
+  - **Verification:** See T129 for verification steps.
 
 ---
 
@@ -343,6 +355,29 @@ They are intended to be adapted per project; IDs here are examples.
   - Add notes to `playbook.md` on steps that required adjustment.
   - Summarise key lessons for future upgrades.
 
+- [ ] T129 [P] Verify Anthropic API key removal
+  - **Critical verification**: Ensure no API keys are present in tracked files
+    before committing or merging.
+  - Check `.env` file (if exists):
+    ```bash
+    grep -i "ANTHROPIC_API_KEY" .env
+    # Expected: No matches (empty output)
+    ```
+    If matches are found, remove the line immediately.
+  - Check Git staging area for API keys:
+    ```bash
+    git diff --cached | grep -i "ANTHROPIC_API_KEY"
+    # Expected: No matches (empty output)
+    ```
+  - Check Git working directory for API keys:
+    ```bash
+    git diff | grep -i "ANTHROPIC_API_KEY"
+    # Expected: No matches (empty output)
+    ```
+  - **Blocker**: If any API keys are found in tracked files or staging area,
+    remove them immediately before proceeding. Do not commit API keys to
+    version control.
+
 - [ ] T128 Prepare for review
   - Commit all changes to feature branch.
   - Create merge request referencing this upgrade documentation.
@@ -350,3 +385,4 @@ They are intended to be adapted per project; IDs here are examples.
     - Number of templates updated.
     - Customisations impacted.
     - Any remaining issues or known regressions.
+    - Confirmation that API keys were removed (T129 completed).
