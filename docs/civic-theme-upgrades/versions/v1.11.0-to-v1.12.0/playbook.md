@@ -354,16 +354,18 @@ Assign impact levels:
 ```bash
 cd /path/to/drupal/project
 
-# Update CivicTheme
-composer require drupal/civictheme:^1.12
+# Update CivicTheme to exact target version
+# IMPORTANT: Use exact version constraint (no ^ or ~) to ensure
+# sequential upgrades install precisely the intended release.
+composer require drupal/civictheme:1.12.0
 
 # Verify the update
 composer show drupal/civictheme | grep versions
-# Expected: 1.12.x
+# Expected: 1.12.0 (exact version, not 1.12.x)
 
 # Commit changes
 git add composer.json composer.lock
-git commit -m "feat: Updated CivicTheme from 1.11.0 to 1.12.x (security release)"
+git commit -m "feat: Updated CivicTheme from 1.11.0 to 1.12.0 (security release)"
 ```
 
 ### 3.2 Remove `|raw` filter from Twig templates (T211) – CRITICAL

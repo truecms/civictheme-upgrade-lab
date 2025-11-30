@@ -592,8 +592,9 @@ does not involve architectural changes like the SDC migration.
 ### 6.2 Change phase
 
 1. **Update Drupal dependencies**:
-   - Run `composer require drupal/civictheme:^1.12` (or update
-     `composer.json` constraint manually).
+   - Run `composer require drupal/civictheme:1.12.0` to install exactly
+     version 1.12.0. **Do NOT use caret (^) or tilde (~) constraints**;
+     sequential upgrades require pinning to the precise target version.
    - Ensure `composer.lock` is regenerated.
    - Run `composer install` to verify lock file consistency.
 

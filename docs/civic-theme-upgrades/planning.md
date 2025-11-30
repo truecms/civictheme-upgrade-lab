@@ -69,6 +69,14 @@ Notes:
   - `playbook.md` is the executable runbook that turns the plan and tasks
     into ordered steps, commands and checks for performing the upgrade.
 - Directory names MUST clearly show the source and target CivicTheme versions.
+- **Exact version constraints are REQUIRED**: When documenting Composer upgrade
+  commands, ALWAYS use exact version constraints (e.g. `drupal/civictheme:1.12.0`)
+  and NEVER use caret (`^`) or tilde (`~`) constraints. This ensures:
+  - The upgrade installs exactly the intended target version.
+  - Sequential upgrade documentation remains valid and predictable.
+  - Developers can follow playbooks step-by-step without unexpected version skips.
+  - Example: For upgrading from 1.11.0 to 1.12.0, use
+    `composer require drupal/civictheme:1.12.0` (not `^1.12`).
 
 You may adjust directory names if your organisation has its own naming
 conventions, but keep them consistent so both AI and developers can navigate

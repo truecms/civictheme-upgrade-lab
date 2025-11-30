@@ -252,8 +252,9 @@ This is a straightforward bug-fix upgrade with minimal complexity.
 ### 6.2 Change phase
 
 1. **Update Drupal dependencies**:
-   - Run `composer require drupal/civictheme:^1.12` (or update constraint
-     to `^1.12.1` if pinning).
+   - Run `composer require drupal/civictheme:1.12.1` to install exactly
+     version 1.12.1. **Do NOT use caret (^) or tilde (~) constraints**;
+     sequential upgrades require pinning to the precise target version.
    - Verify `composer.lock` is regenerated.
 
 2. **Remove workarounds** (if applicable):

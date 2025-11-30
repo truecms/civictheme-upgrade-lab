@@ -50,6 +50,12 @@ specs/
 - Upgrades are **sequential and single-release**: one upstream CivicTheme
   release per `vX.Y.Z-to-vA.B.C` directory; do not combine multiple
   version jumps into a single plan.
+- **Exact version constraints are REQUIRED**: When upgrading CivicTheme via
+  Composer, ALWAYS use exact version constraints (e.g. `drupal/civictheme:1.12.0`)
+  and NEVER use caret (`^`) or tilde (`~`) constraints. This ensures:
+  - The upgrade installs exactly the intended target version.
+  - Sequential upgrade documentation remains valid and predictable.
+  - Developers can follow playbooks step-by-step without unexpected version skips.
 - AI assistants SHOULD:
   - Refresh the customisation register on every run.
   - Use the per-version `spec.md` + `tasks.md` + `playbook.md` trio as the
