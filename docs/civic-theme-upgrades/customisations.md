@@ -38,19 +38,20 @@ both CSS files (via a sub-theme library) to the events view row so tags keep
 their colors, pill styling, and horizontal placement after the 1.11+ split
 bundles.
 
-### Upgrade note: Workshop filter component styling
+### Upgrade note: Custom filter/banner components using CivicTheme lists
 
-If a project provides a custom "workshop filter" banner (e.g., on
-`/events/supervisory-groups-workshops`) that relies on bespoke classes
-like `sts-workshop-filter*`, ensure the corresponding compiled CSS is
-loaded. In 1.11+ only the JS may be attached, leaving the dark background,
-layout spacing, spinner, and reset button unstyled. Mitigation:
+If a project ships bespoke filter or banner components (e.g., day/workshop
+filters) that sit on top of CivicTheme list markup (`ct-list`,
+`ct-list--with-background`), ensure their libraries deliver **all** required
+CSS. After the 1.11 split bundles, JS may load without the supporting styles,
+leaving backgrounds, spacing, and buttons unstyled.
 
-- Add the compiled CSS to the same library as the JS, e.g.
-  `components_combined/02-molecules/workshop-filter/workshop-filter.css`.
-- Confirm the library is attached where the filter renders (page
-  attachments alter hook or Twig). Keep this noted so future upgrades
-  preserve the CSS attach and avoid the unstyled filter regression.
+- Package the compiled CSS for the custom component **and** any CivicTheme
+  dependencies (for example, `components_combined/03-organisms/list/list.css`
+  when using list backgrounds) in the same library as the JS.
+- Attach that library wherever the component renders (`attach_library()` in
+  Twig or preprocess `#attached`). Record the dependency here so future
+  upgrades can restore the attach if it is dropped.
 
 ### Upgrade note: Website feedback webform styling
 

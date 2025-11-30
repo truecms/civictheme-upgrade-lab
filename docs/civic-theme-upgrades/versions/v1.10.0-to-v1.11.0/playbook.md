@@ -994,7 +994,7 @@ to Single Directory Components (SDC).
 
 ### Known Issues / Follow-ups
 - CivicTheme 1.11 splits CSS by component and no longer bundles custom component styles into a single `styles.css`. Any bespoke Twig that renders custom markup (not an SDC component) can lose styling. Fix: add a theme library that points to the generated component CSS (e.g. `components_combined/05-pages/<component>/<component>.css`) and attach it in the Twig template, or restore a project-level bundle that imports those components. Example fix for events: add an `event-page` library pointing to `components_combined/05-pages/event/event.css` and call `attach_library('theme/event-page')` on the event node template.
-- Custom workshop filter banner on `/events/supervisory-groups-workshops` lost styling because the `component.workshop-filter` library only loaded JS. Add the compiled CSS (`components_combined/02-molecules/workshop-filter/workshop-filter.css`) to the library (or include in a site bundle) and keep the page attachment in place so the dark background, spacing, and reset button styling persist after upgrades.
+- Bespoke filter/banner components that layer custom markup over CivicTheme list backgrounds can lose styles after the 1.11 CSS split when their libraries ship JS only. Fix by bundling the compiled custom CSS together with any dependent CivicTheme CSS (for example, the list organism CSS) in the same library and ensuring the page keeps `attach_library()`/`#attached` calls so backgrounds and buttons stay styled.
 
 ### Documentation
 See `docs/civic-theme-upgrades/versions/v1.10.0-to-v1.11.0/` for full
