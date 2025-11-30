@@ -162,12 +162,14 @@ grep -E "^[A-Za-z0-9_.-]+:" $SUBTHEME_PATH/*.libraries.yml | head -50
 ```bash
 cd /path/to/drupal/project
 
-# Update CivicTheme
-composer require drupal/civictheme:^1.12
+# Update CivicTheme to exact target version
+# IMPORTANT: Use exact version constraint (no ^ or ~) to ensure
+# sequential upgrades install precisely the intended release.
+composer require drupal/civictheme:1.12.1
 
 # Verify the update
 composer show drupal/civictheme | grep versions
-# Expected: 1.12.1
+# Expected: 1.12.1 (exact version)
 
 # Commit changes
 git add composer.json composer.lock

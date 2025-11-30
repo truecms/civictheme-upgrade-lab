@@ -402,16 +402,18 @@ Assign impact levels:
 ```bash
 cd /path/to/drupal/project
 
-# Update CivicTheme
-composer require drupal/civictheme:^1.11
+# Update CivicTheme to exact target version
+# IMPORTANT: Use exact version constraint (no ^ or ~) to ensure
+# sequential upgrades install precisely the intended release.
+composer require drupal/civictheme:1.11.0
 
 # Verify the update
 composer show drupal/civictheme | grep versions
-# Expected: 1.11.x
+# Expected: 1.11.0 (exact version, not 1.11.x)
 
 # Commit changes
 git add composer.json composer.lock
-git commit -m "feat: Updated CivicTheme from 1.10.0 to 1.11.x"
+git commit -m "feat: Updated CivicTheme from 1.10.0 to 1.11.0"
 ```
 
 ### 3.2 Update Twig include syntax (T111) – HIGH PRIORITY

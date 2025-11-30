@@ -177,10 +177,12 @@ accordingly.
 ## Change tasks
 
 - [ ] T210 [P] Apply CivicTheme composer update
-  - Run `composer require drupal/civictheme:^1.12` in a non-production
-    environment.
+  - Run `composer require drupal/civictheme:1.12.0` in a non-production
+    environment. **Use exact version (no ^/~)** to ensure sequential
+    upgrade installs precisely the intended release.
   - Verify `composer.lock` is regenerated.
   - Run `composer install` to confirm lock file consistency.
+  - Verify version is exactly 1.12.0: `composer show drupal/civictheme | grep versions`
   - Commit changes to `composer.json` and `composer.lock` together.
 
 - [ ] T211 [P] Remove `|raw` filter from Twig template overrides (CRITICAL)

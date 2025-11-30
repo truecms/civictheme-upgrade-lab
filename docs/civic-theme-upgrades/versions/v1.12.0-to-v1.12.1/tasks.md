@@ -59,11 +59,12 @@ media was being stripped from WYSIWYG content.
 ## Change tasks
 
 - [ ] T310 [P] Apply CivicTheme composer update
-  - Run `composer require drupal/civictheme:^1.12` in a non-production
-    environment.
+  - Run `composer require drupal/civictheme:1.12.1` in a non-production
+    environment. **Use exact version (no ^/~)** to ensure sequential
+    upgrade installs precisely the intended release.
   - Verify `composer.lock` is regenerated.
   - Run `composer install` to confirm lock file consistency.
-  - Verify version is 1.12.1:
+  - Verify version is exactly 1.12.1:
     ```bash
     composer show drupal/civictheme | grep versions
     ```
