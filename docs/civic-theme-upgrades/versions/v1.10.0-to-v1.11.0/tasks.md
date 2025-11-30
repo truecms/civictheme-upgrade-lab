@@ -213,7 +213,9 @@ They are intended to be adapted per project; IDs here are examples.
 
 - [ ] T116 Update build tooling (choose one approach)
   - **T116a – Use CivicTheme upgrade-tools (storybook-v8-update / sdc-update)**
-    - Prereqs: Node.js 22+, Anthropic API key available.
+    - Prereqs for this optional helper: Node.js 22+ and an Anthropic API key.
+      If you prefer not to provide a key, skip T116a and complete T116b
+      (manual update) instead – the upgrade remains valid.
     - **⛔ STOP CONDITION – Anthropic API Key Required**
       - AI assistants MUST stop and request developer action before proceeding.
       - The story conversion script requires `ANTHROPIC_API_KEY` to call the
@@ -222,7 +224,9 @@ They are intended to be adapted per project; IDs here are examples.
         project's `.env` file (ensure `.env` is in `.gitignore`).
       - **Alternative:** Export in shell session or add to `~/.bashrc` /
         `~/.zshrc` and source the file.
-      - Wait for developer to confirm key is available before proceeding.
+      - Wait for developer to confirm key is available before proceeding; if
+        they do not confirm or decline to provide a key, do **not** run T116a
+        and instead follow T116b.
       - **Security:** Remind developer to remove/unset the key after upgrade.
     - Clone tools: `git clone https://github.com/civictheme/upgrade-tools.git`.
     - `cd upgrade-tools/storybook-v8-update && npm install`.

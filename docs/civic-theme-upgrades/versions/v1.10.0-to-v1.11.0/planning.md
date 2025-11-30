@@ -45,8 +45,10 @@ minor version bump – it requires significant sub-theme updates.
 - [ ] Database and file backups exist.
 - [ ] Dedicated feature branch created.
 - [ ] Drupal core is `>=10.2` (prerequisite).
-- [ ] **Anthropic API key available** (required for upgrade-tools story
-  conversion). See Section 3 for configuration instructions.
+- [ ] (Optional) Anthropic API key available **only if** you plan to use the
+  CivicTheme upgrade-tools helper for Storybook story conversion (T116a). See
+  Section 3 for configuration instructions; otherwise you may proceed with the
+  manual build tooling path.
 
 ### Recommended task order
 
@@ -95,6 +97,11 @@ The CivicTheme upgrade-tools (storybook-v8-update / sdc-update) require an
 
 **AI assistants MUST stop and request developer confirmation before proceeding
 with the upgrade-tools.**
+
+**Important:** These upgrade-tools are an **optional helper only**. If the
+developer prefers not to configure an Anthropic API key, simply skip the tools
+and use the manual build tooling path (T116b). The overall CivicTheme upgrade
+can continue without an Anthropic key.
 
 **Configuration options (choose one):**
 

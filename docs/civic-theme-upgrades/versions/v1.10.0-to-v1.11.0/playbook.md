@@ -281,7 +281,8 @@ they can be reused across projects.
 **Prerequisites**
 
 - Node.js ≥ 22
-- **Anthropic API key** (see STOP CONDITION below)
+- **Anthropic API key** (required only if you choose to use this helper;
+  see STOP CONDITION below)
 - Clean working copy or feature branch (the tool rewrites `package.json`,
   `.storybook`, `build.js`, component stories)
 
@@ -292,6 +293,11 @@ they can be reused across projects.
 **AI assistants MUST stop here and request developer action** before proceeding
 with the upgrade-tools. The Storybook story conversion script requires an
 `ANTHROPIC_API_KEY` to call the Anthropic Claude API.
+
+These upgrade-tools are **optional**. If the developer does not wish to
+configure an Anthropic API key, skip Section 2.4 entirely and rely on the
+manual build tooling updates in Section 3.8 (Option B). The upgrade can
+proceed without the key.
 
 **Action required from developer:**
 
@@ -328,7 +334,9 @@ with the upgrade-tools. The Storybook story conversion script requires an
 > - [ ] Added to `.env` file in the destination project (preferred)
 > - [ ] Exported in shell session / shell configuration file
 >
-> Once confirmed, the AI assistant may proceed with the upgrade-tools execution.
+> Once confirmed, the AI assistant may proceed with the upgrade-tools
+> execution. If neither option is selected (no key configured), do **not**
+> run the upgrade-tools; continue with the manual build tooling steps instead.
 
 ---
 
@@ -569,6 +577,11 @@ Anthropic Claude API.
 
 If you have not yet configured the key (or skipped Section 2.4), request
 developer confirmation now:
+
+**Note:** Option A is an **optional helper**. If the developer prefers not to
+configure an Anthropic API key, skip Option A and proceed directly to
+**Option B – Manual update** below. The CivicTheme upgrade can continue
+without the key.
 
 **Action required from developer:**
 
