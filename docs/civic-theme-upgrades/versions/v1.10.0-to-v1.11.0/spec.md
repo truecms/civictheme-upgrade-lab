@@ -72,17 +72,19 @@ preparing and validating this upgrade:
       manual steps in Section 6.2 instead.
     - When used, it requires Node.js 22+, a CivicTheme sub-theme already
       updated to CivicTheme 1.10.x, and an Anthropic API key.
-    - **⛔ STOP CONDITION for AI assistants:** The tool requires an
-      `ANTHROPIC_API_KEY`. Before executing, AI assistants MUST stop and
-      request developer confirmation that the key is available:
-      - **Preferred:** Add `ANTHROPIC_API_KEY=sk-ant-...` to the destination
-        project's `.env` file (ensure it is in `.gitignore`).
-      - **Alternative:** Export the key in the shell session or add to
-        `~/.bashrc` / `~/.zshrc`.
-      - Only proceed with this optional helper after the developer confirms
-        the key is configured; if they decline or no key is available, do
-        **not** run the tool and instead use the manual path.
-      - Remind developer to remove/unset the key after upgrade completes.
+      - **⛔ STOP CONDITION for AI assistants:** The tool requires an
+        `ANTHROPIC_API_KEY`. Before executing, AI assistants MUST stop and
+        request developer confirmation that the key is available:
+        - **Preferred:** Add `ANTHROPIC_API_KEY=sk-ant-...` to the destination
+          project's `.env` file.
+        - **Alternative:** Export the key in the shell session or add to
+          `~/.bashrc` / `~/.zshrc`.
+        - Only proceed with this optional helper after the developer confirms
+          the key is configured; if they decline or no key is available, do
+          **not** run the tool and instead use the manual path.
+        - **Critical:** Remind developer to remove/unset the key after upgrade
+          completes (see T119 in `tasks.md` for removal steps and T129 for
+          verification).
     - Run in a throwaway working copy or feature branch only (it
       updates `package.json`, Storybook config, `build.js` and
       component directories).
@@ -525,13 +527,15 @@ thorough preparation than typical minor version bumps.
        - If the developer does **not** want to provide a key or no key is
          available, skip Option A entirely and use Option B (manual update)
          instead – the CivicTheme upgrade remains valid without the helper.
+       - **Critical:** After upgrade completes, remove the key (see T119) and
+         verify removal (see T129) to prevent accidental commit.
      - Clone `https://github.com/civictheme/upgrade-tools`.
      - Install dependencies: `npm install`.
      - Configure `.env` with sub-theme path and Anthropic API key (only when
        using the helper).
      - Run `npm run update-components`.
      - Review changes in `.logs/` and apply selectively.
-     - **Post-completion:** Remind developer to remove/unset the key.
+     - **Post-completion:** Remove the key using T119 and verify using T129.
    - **Option B – Manual update**:
      - Update `package.json` dependencies to match 1.11.0 starter kit.
      - Copy new `build.js` and `build-config.json` from starter kit.

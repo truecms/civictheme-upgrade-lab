@@ -112,8 +112,6 @@ can continue without an Anthropic key.
    echo 'ANTHROPIC_API_KEY=sk-ant-...' >> .env
    ```
 
-   Ensure `.env` is listed in `.gitignore`.
-
 2. **Alternative – Shell environment:**
 
    ```bash

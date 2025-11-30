@@ -309,8 +309,6 @@ proceed without the key.
    echo 'ANTHROPIC_API_KEY=sk-ant-...' >> .env
    ```
 
-   Ensure `.env` is listed in `.gitignore` (it typically is in Drupal projects).
-
 2. **Alternative method** – Export the key in your shell session or shell
    configuration file (`~/.bashrc`, `~/.zshrc`):
 
@@ -332,7 +330,7 @@ proceed without the key.
 > Please confirm how the `ANTHROPIC_API_KEY` has been added:
 >
 > - [ ] Added to `.env` file in the destination project (preferred)
-> - [ ] Exported in shell session / shell configuration file
+> - [ ] Exported in shell session / shell configuration file (alternative)
 >
 > Once confirmed, the AI assistant may proceed with the upgrade-tools
 > execution. If neither option is selected (no key configured), do **not**
@@ -634,9 +632,9 @@ cd /path/to/your/subtheme
 git diff
 ```
 
-**Post-completion reminder:** Once the upgrade is complete, remove the
-`ANTHROPIC_API_KEY` from the destination project's `.env` file or unset it
-from your shell environment (`unset ANTHROPIC_API_KEY`).
+**Post-completion reminder:** See Section 3.11 for API key removal steps
+(T119). Do not proceed to validation until the key has been removed and
+verified (T129).
 
 **Option B – Manual update**:
 
@@ -700,7 +698,38 @@ git status  # Review all changes
 git commit -m "feat: Updated sub-theme for CivicTheme 1.11 SDC migration"
 ```
 
-### 3.11 Known issues and workarounds
+### 3.11 Remove Anthropic API key (T119)
+
+**Critical security task**: Remove the `ANTHROPIC_API_KEY` immediately after
+completing the upgrade-tools steps to prevent accidental commit of sensitive
+credentials.
+
+**If added to `.env` file:**
+
+```bash
+# Remove the API key line from .env
+sed -i '' '/ANTHROPIC_API_KEY/d' .env
+
+# Verify removal
+grep -i "ANTHROPIC_API_KEY" .env
+# Expected: No matches (empty output)
+```
+
+**If exported in shell:**
+
+```bash
+# Remove from current session
+unset ANTHROPIC_API_KEY
+
+# If added to shell config, remove the export line
+sed -i '' '/ANTHROPIC_API_KEY/d' ~/.bashrc  # or ~/.zshrc
+source ~/.bashrc  # or source ~/.zshrc
+```
+
+**Verification:** Proceed to Section 4.8 for comprehensive verification
+steps (T129).
+
+### 3.12 Known issues and workarounds
 
 - **InvalidComponentException: Unable to find Twig template for component** —
   can occur if a custom component directory contains a `.component.yml` but no
@@ -880,6 +909,44 @@ docker compose exec cli ./vendor/bin/behat
    Document but do not block upgrade.
 3. If a test failed before and passes after → **Bonus improvement**.
    Document the fix.
+
+### 4.8 Verify Anthropic API key removal (T129)
+
+**Critical verification**: Before committing or merging, ensure no API keys
+are present in tracked files or staging area.
+
+```bash
+# Check .env file (if exists)
+if [ -f ".env" ]; then
+  echo "=== Checking .env ==="
+  if grep -qi "ANTHROPIC_API_KEY" .env; then
+    echo "⚠️  WARNING: ANTHROPIC_API_KEY found in .env - REMOVE IMMEDIATELY"
+    exit 1
+  fi
+  echo "✅ .env file checked - no API key found"
+fi
+
+# Check Git staging area
+echo "=== Checking Git staging area ==="
+if git diff --cached | grep -qi "ANTHROPIC_API_KEY"; then
+  echo "⚠️  WARNING: ANTHROPIC_API_KEY found in staged changes - REMOVE IMMEDIATELY"
+  exit 1
+fi
+echo "✅ Staging area checked - no API key found"
+
+# Check Git working directory
+echo "=== Checking Git working directory ==="
+if git diff | grep -qi "ANTHROPIC_API_KEY"; then
+  echo "⚠️  WARNING: ANTHROPIC_API_KEY found in working directory changes - REMOVE IMMEDIATELY"
+  exit 1
+fi
+echo "✅ Working directory checked - no API key found"
+
+echo "✅ API key verification complete - no keys found in tracked files"
+```
+
+**Blocker**: If any API keys are found, remove them immediately before
+proceeding. Do not commit API keys to version control.
 
 ### 4.9 Document validation results
 
