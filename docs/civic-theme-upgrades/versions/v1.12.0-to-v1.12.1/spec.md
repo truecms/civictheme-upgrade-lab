@@ -306,6 +306,40 @@ When assisting with this upgrade, AI models SHOULD:
 
 ---
 
+## 8. References
+
+This section provides links to official upstream resources for the CivicTheme `1.12.0 → 1.12.1` upgrade.
+
+### Release information
+
+- **CivicTheme 1.12.0 release notes** (source version):  
+  https://www.drupal.org/project/civictheme/releases/1.12.0
+- **CivicTheme 1.12.1 release notes** (target version):  
+  https://www.drupal.org/project/civictheme/releases/1.12.1
+- **CivicTheme documentation portal**:  
+  https://docs.civictheme.io/changelog
+
+### Code comparison
+
+- **Git diff** (1.12.0 → 1.12.1):  
+  https://git.drupalcode.org/project/civictheme/-/compare/1.12.0...1.12.1?from_project_id=86817
+
+### Upgrade tools and resources
+
+- **CivicTheme Upgrade Tools** (optional helper scripts):  
+  https://github.com/civictheme/upgrade-tools/blob/main/README.md
+- **CivicTheme Drupal.org project page**:  
+  https://www.drupal.org/project/civictheme
+- **CivicTheme main website**:  
+  https://civictheme.io
+
+### Security advisories
+
+- **Security advisories** (if applicable):  
+  Check https://www.drupal.org/security/contrib for any security advisories related to CivicTheme 1.12.0 or 1.12.1
+
+---
+
 ## 8. Developer review checklist
 
 Before considering the 1.12.0 → 1.12.1 upgrade complete, a developer
