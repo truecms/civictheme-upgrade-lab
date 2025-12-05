@@ -97,6 +97,12 @@ composer show drupal/civictheme | grep versions
 # Expected: 1.11.x
 ```
 
+**STOP CONDITION**: If this command does not report a `1.11.x` release (for
+example, if the site is still on `1.10.x` or has already moved to `1.12.x`),
+do **not** continue with this per-version upgrade. Adjust the environment or
+select the CivicTheme upgrade directory whose from/to versions match the
+installed version before proceeding.
+
 ### 1.8 Discover available front-end commands
 
 ```bash
@@ -367,6 +373,12 @@ composer show drupal/civictheme | grep versions
 git add composer.json composer.lock
 git commit -m "feat: Updated CivicTheme from 1.11.0 to 1.12.0 (security release)"
 ```
+
+**STOP CONDITION**: After running the above commands, if
+`composer show drupal/civictheme | grep versions` does **not** report
+`1.12.0`, treat the upgrade as incomplete. Do **not** continue with later
+steps or start the next CivicTheme upgrade until the version mismatch is
+resolved.
 
 ### 3.2 Remove `|raw` filter from Twig templates (T211) – CRITICAL
 
@@ -761,6 +773,11 @@ composer show drupal/civictheme | grep versions
 # Check for deprecation warnings (indicates missed API updates)
 drush watchdog:show --filter="deprecated" --count=50
 ```
+
+**Blocker / STOP CONDITION**: If this final version check does **not** report a
+`1.12.x` release, or if deprecation warnings indicate missed API updates, do
+**not** proceed to the next CivicTheme upgrade step or consider this security
+release complete. Investigate and correct the mismatch before continuing.
 
 ### 4.3 XSS testing (T232) – CRITICAL
 

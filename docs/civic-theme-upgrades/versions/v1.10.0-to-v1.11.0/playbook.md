@@ -95,6 +95,11 @@ composer show drupal/civictheme | grep versions
 # Expected: 1.10.0
 ```
 
+**STOP CONDITION**: If this command does not report `1.10.0` exactly, do **not**
+continue with this per-version upgrade. Adjust the environment or select the
+correct CivicTheme upgrade directory so that the installed version matches the
+documented "from" version before proceeding.
+
 ### 1.8 Discover available front-end commands
 
 Before making changes, identify how front-end tooling (npm) is run in this
@@ -413,6 +418,12 @@ composer show drupal/civictheme | grep versions
 git add composer.json composer.lock
 git commit -m "feat: Updated CivicTheme from 1.10.0 to 1.11.0"
 ```
+
+**STOP CONDITION**: After running the above commands, if
+`composer show drupal/civictheme | grep versions` does **not** report
+`1.11.0`, treat the upgrade as incomplete. Do **not** continue with further
+changes or start the next CivicTheme upgrade step until the version mismatch
+is understood and corrected.
 
 ### 3.2 Update Twig include syntax (T111) – HIGH PRIORITY
 
@@ -771,6 +782,19 @@ drush cim -y
 # Check for errors during these operations
 echo $?  # Should be 0
 ```
+
+After clearing caches and running updates, re-check the installed CivicTheme
+version:
+
+```bash
+composer show drupal/civictheme | grep versions
+# Expected: 1.11.0
+```
+
+**Blocker / STOP CONDITION**: If this final check does **not** report
+`1.11.0`, treat the upgrade as failed. Do **not** start the next CivicTheme
+upgrade step or close this task until the version mismatch is understood and
+corrected.
 
 ### 4.2 Check logs for SDC-related errors (T121)
 

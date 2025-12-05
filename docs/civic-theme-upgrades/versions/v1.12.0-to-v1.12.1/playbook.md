@@ -69,6 +69,11 @@ composer show drupal/civictheme | grep versions
 # Expected: 1.12.0
 ```
 
+**STOP CONDITION**: If this command does not report `1.12.0` exactly, do **not**
+continue with this per-version upgrade. Adjust the environment or select the
+matching CivicTheme upgrade directory so that the installed version aligns
+with the documented "from" version before proceeding.
+
 ### 1.7 Verify Drupal core version
 
 ```bash
@@ -176,6 +181,12 @@ git add composer.json composer.lock
 git commit -m "chore: Updated CivicTheme from 1.12.0 to 1.12.1 (bug fix release)"
 ```
 
+**STOP CONDITION**: After running the above commands, if
+`composer show drupal/civictheme | grep versions` does **not** report
+`1.12.1`, treat the upgrade as incomplete. Do **not** proceed with later
+steps or start the next CivicTheme upgrade until the version mismatch is
+resolved.
+
 ### 3.2 Remove 1.12.0 workarounds (T311) – if applicable
 
 If you identified workarounds in Section 2.1, remove them now:
@@ -267,6 +278,11 @@ sync directory.
 composer show drupal/civictheme | grep versions
 # Expected: 1.12.1
 ```
+
+**Blocker / STOP CONDITION**: If this final check does **not** report
+`1.12.1`, treat the upgrade as failed. Do **not** start the next CivicTheme
+upgrade step or close this task until the version mismatch is understood and
+corrected.
 
 ### 4.3 Test embedded media rendering (T322)
 

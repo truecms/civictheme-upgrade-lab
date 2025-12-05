@@ -41,7 +41,7 @@ Downstream projects are expected to adapt and extend these documents rather than
 
 ## Installing into your project
 
-You typically add this framework **into an existing Drupal project that already uses CivicTheme**. The goal is to introduce the `docs/civic-theme-upgrades/` structure (plus supporting docs) into that project.
+You typically add this framework **into an existing Drupal project that already uses CivicTheme**. The goal is to introduce the `docs/civic-theme-upgrades/` structure (plus supporting docs) into that project. All examples, internal links, and the AI starting prompt assume this canonical path relative to your project root.
 
 ### Option 1: Download as a ZIP
 
@@ -69,11 +69,9 @@ This is the simplest way to “vendor” the documentation into an existing repo
 
 2. Your project will now contain:
    - `tools/civictheme-upgrade-assistant/docs/civic-theme-upgrades/`
-3. Decide how you want to expose the upgrade docs:
-   - Either **reference them in place** (for example, point developers and AI assistants at `tools/civictheme-upgrade-assistant/docs/civic-theme-upgrades/`), or
-   - Copy or symlink `tools/civictheme-upgrade-assistant/docs/civic-theme-upgrades/` into your main `docs/` directory so the canonical path in your project becomes `docs/civic-theme-upgrades/…`.
+3. To make the paths in this framework (including the AI starting prompt) work as written, copy or symlink `tools/civictheme-upgrade-assistant/docs/civic-theme-upgrades/` into your main `docs/` directory so the canonical path in your project becomes `docs/civic-theme-upgrades/…`.
 
-Cloning keeps this framework as a separate Git history while still making all docs available in your project.
+Cloning keeps this framework as a separate Git history while still making all docs available in your project; the `docs/civic-theme-upgrades/` directory in your project remains the canonical location that developers and AI assistants should use.
 
 ## How to use it (high level)
 
