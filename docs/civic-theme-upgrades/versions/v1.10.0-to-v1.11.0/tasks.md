@@ -17,6 +17,11 @@ They are intended to be adapted per project; IDs here are examples.
     version.
   - Verify Drupal core is `>=10.2` (CivicTheme 1.11.0 requires
     `core_version_requirement: ^10.2 || ^11`).
+  - **STOP CONDITION**: If `composer show drupal/civictheme` does not report
+    `1.10.0` exactly, do **not** proceed with this per-version upgrade.
+    Update the environment or choose the correct CivicTheme upgrade directory
+    so that the installed version matches the documented "from" version before
+    continuing.
   - **Blocker**: If Drupal is `<10.2`, this CivicTheme upgrade is blocked.
     Create a separate issue for Drupal core upgrade and complete that
     first.
@@ -123,6 +128,10 @@ They are intended to be adapted per project; IDs here are examples.
   - Verify `composer.lock` is regenerated.
   - Run `composer install` to confirm lock file consistency.
   - Verify version is exactly 1.11.0: `composer show drupal/civictheme | grep versions`
+  - **STOP CONDITION**: If the installed `drupal/civictheme` version is not
+    `1.11.0` after this step, treat the upgrade as incomplete. Do **not**
+    proceed to subsequent CivicTheme upgrades or mark this one as complete
+    until the version mismatch is resolved.
   - Commit changes to `composer.json` and `composer.lock` together.
 
 - [ ] T111 [P] Update Twig include syntax (HIGH PRIORITY)
@@ -282,6 +291,14 @@ They are intended to be adapted per project; IDs here are examples.
   - Run database updates: `drush updb`.
   - Import configuration: `drush cim` (if pending).
   - Check for PHP errors during these operations.
+
+- [ ] T120a [P] Verify CivicTheme version after upgrade
+  - Run `composer show drupal/civictheme | grep versions` and confirm
+    CivicTheme `1.11.0` is installed.
+  - **Blocker / STOP CONDITION**: If the reported version is not `1.11.0`,
+    treat this per-version upgrade as failed. Do **not** proceed to the next
+    CivicTheme upgrade step or close this task until the version mismatch is
+    understood and corrected.
 
 - [ ] T121 [P] Check logs for SDC-related errors
   - Review Drupal watchdog/dblog for:

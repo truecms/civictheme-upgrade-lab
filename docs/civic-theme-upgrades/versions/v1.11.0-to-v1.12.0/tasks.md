@@ -22,6 +22,11 @@ accordingly.
     version.
   - Verify Drupal core meets `^10.2 || ^11` requirement (unchanged from
     1.11.0).
+  - **STOP CONDITION**: If `composer show drupal/civictheme` does not report a
+    `1.11.x` release (for example, if the site is still on `1.10.x` or has
+    already moved to `1.12.x`), do **not** continue with this per-version
+    upgrade. Align the environment with the documented "from" version or
+    select the matching CivicTheme upgrade directory before proceeding.
   - **Note**: Use `ahoy drush` or `docker compose exec cli drush` if
     running in a Docker-based local environment.
 
@@ -183,6 +188,10 @@ accordingly.
   - Verify `composer.lock` is regenerated.
   - Run `composer install` to confirm lock file consistency.
   - Verify version is exactly 1.12.0: `composer show drupal/civictheme | grep versions`
+  - **STOP CONDITION**: If the installed `drupal/civictheme` version is not
+    `1.12.0` after this step, treat the upgrade as incomplete. Do **not**
+    move on to later CivicTheme upgrades or mark these security advisories as
+    addressed until the version mismatch is understood and corrected.
   - Commit changes to `composer.json` and `composer.lock` together.
 
 - [ ] T211 [P] Remove `|raw` filter from Twig template overrides (CRITICAL)
@@ -352,6 +361,11 @@ accordingly.
     ```bash
     composer show drupal/civictheme | grep versions
     ```
+    **Blocker / STOP CONDITION**: If the reported version is not within the
+    expected `1.12.x` range, do **not** proceed to subsequent CivicTheme
+    upgrades or close this one. Investigate and correct the mismatch (for
+    example, fix composer constraints or rerun the upgrade) before
+    continuing.
   - **T231b**: Check for deprecation warnings (indicates missed API updates):
     ```bash
     drush watchdog:show --filter="deprecated" --count=50

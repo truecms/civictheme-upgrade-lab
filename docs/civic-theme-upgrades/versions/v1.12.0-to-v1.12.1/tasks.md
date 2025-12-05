@@ -21,6 +21,11 @@ media was being stripped from WYSIWYG content.
     version.
   - Verify Drupal core meets `^10.2 || ^11` requirement (unchanged from
     1.12.0).
+  - **STOP CONDITION**: If `composer show drupal/civictheme` does not report
+    `1.12.0` exactly, do **not** proceed with this per-version upgrade.
+    Update the environment or select the correct CivicTheme upgrade
+    directory so that the installed version matches the documented "from"
+    version before continuing.
   - **Note**: Use `ahoy drush` or `docker compose exec cli drush` if
     running in a Docker-based local environment.
 
@@ -68,6 +73,10 @@ media was being stripped from WYSIWYG content.
     ```bash
     composer show drupal/civictheme | grep versions
     ```
+  - **STOP CONDITION**: If the installed `drupal/civictheme` version is not
+    `1.12.1` after this step, treat the upgrade as incomplete. Do **not**
+    proceed to subsequent CivicTheme upgrades or mark this one as complete
+    until the version mismatch is understood and corrected.
   - Commit changes to `composer.json` and `composer.lock` together.
 
 - [ ] T311 Remove 1.12.0 workarounds (if applicable)
@@ -108,6 +117,10 @@ media was being stripped from WYSIWYG content.
     ```bash
     composer show drupal/civictheme | grep versions
     ```
+  - **Blocker / STOP CONDITION**: If the reported version is not `1.12.1`,
+    treat this per-version upgrade as failed. Do **not** proceed to the next
+    CivicTheme upgrade step or close this task until the version mismatch is
+    understood and corrected.
 
 - [ ] T322 [P] Test embedded media rendering
   - Navigate to pages with embedded media (iframes, figures, videos).
