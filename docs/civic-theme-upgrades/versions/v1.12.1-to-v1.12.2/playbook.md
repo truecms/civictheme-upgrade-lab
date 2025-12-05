@@ -132,7 +132,7 @@ echo "=== Checking includes directory ==="
 ls -la $SUBTHEME_PATH/includes/ 2>/dev/null
 
 echo "=== Searching for HTML string patterns ==="
-grep -rn "\$variables\[" $SUBTHEME_PATH/*.theme $SUBTHEME_PATH/includes/ 2>/dev/null | grep -E "(<[a-z]|'>|\">" ) | head -50
+grep -rn "\$variables\[" $SUBTHEME_PATH/*.theme $SUBTHEME_PATH/includes/ 2>/dev/null | grep -E "(<[a-z]|'>|\">)" | head -50
 ```
 
 **Look for patterns like**:
