@@ -15,6 +15,136 @@ real customisations in each destination project.
 - [ ] C001 Example sub-theme overrides (Twig, SCSS, JS) – replace with
       real items in destination projects.
 
+---
+
+## Recording parent-theme modifications
+
+If direct modifications have been made to the upstream CivicTheme parent
+theme (`web/themes/contrib/civictheme/`), these **MUST** be recorded here
+as **HIGH** risk entries. Parent-theme modifications will be **overwritten**
+during any upgrade and require special handling.
+
+### How to detect parent-theme modifications
+
+During pre-flight checks, compare the installed `web/themes/contrib/civictheme/`
+against a pristine copy of the version shown in `composer.lock`. Any differences
+indicate local modifications.
+
+### Recording format for parent-theme modifications
+
+Use this format for each modification found:
+
+```markdown
+- [ ] C0XX [HIGH] Parent theme modification - web/themes/contrib/civictheme/<path>
+      Locked version: <version from composer.lock>
+      Change: <brief description of what was modified>
+      WARNING: Will be overwritten on upgrade – requires migration strategy
+```
+
+**Example entries**:
+
+```markdown
+- [ ] C010 [HIGH] Parent theme modification - web/themes/contrib/civictheme/templates/block/civictheme-banner.html.twig
+      Locked version: 1.11.0
+      Change: Added custom CTA button below banner title
+      WARNING: Will be overwritten on upgrade – requires migration strategy
+
+- [ ] C011 [HIGH] Parent theme modification - web/themes/contrib/civictheme/components/02-molecules/navigation/navigation.twig
+      Locked version: 1.11.0
+      Change: Modified mobile menu breakpoint logic
+      WARNING: Will be overwritten on upgrade – requires migration strategy
+```
+
+### Handling parent-theme modifications during upgrades
+
+When parent-theme modifications are detected:
+
+1. **STOP** the upgrade process and notify the developer
+2. The developer must decide how to handle each modification:
+   - **Migrate to sub-theme**: Move the customisation to the sub-theme (preferred)
+   - **Re-apply after upgrade**: Accept that the change will be lost and re-apply
+     manually after upgrading
+   - **Create a patch**: Generate a patch file that can be re-applied post-upgrade
+   - **Abandon**: If the customisation is no longer needed, remove the register entry
+3. Document the decision in the `Change:` field
+4. Only proceed with the upgrade after all parent-theme modifications have a
+   documented resolution strategy
+
+---
+
+## Recording Composer patches for CivicTheme
+
+Projects using `cweagans/composer-patches` (or similar) may apply patches to
+`drupal/civictheme`. These patches are **legitimate customisations** that:
+
+- Cause the installed theme to differ from upstream (expected behaviour)
+- Must be tracked in this register so they are not forgotten during upgrades
+- May need updating or removal when upgrading to versions that include the fix
+
+### How to detect Composer patches
+
+Check `composer.json` for:
+
+```bash
+# Inline patches
+grep -A50 '"patches"' composer.json | grep -A10 '"drupal/civictheme"'
+
+# External patches file reference
+grep '"patches-file"' composer.json
+```
+
+If `cweagans/composer-patches` is in `composer.lock`, the project uses Composer patches.
+
+### Recording format for Composer patches
+
+Use this format for each patch applied to CivicTheme:
+
+```markdown
+- [ ] C0XX [MEDIUM] Composer patch - <patch description>
+      Locked version: <CivicTheme version this patch applies to>
+      Patch source: <URL or local file path>
+      Rationale: <why this patch is needed>
+      Removal criteria: <when this patch can be removed, e.g., "fixed in 1.13.0">
+```
+
+**Example entries**:
+
+```markdown
+- [ ] C020 [MEDIUM] Composer patch - Fix mobile navigation accessibility
+      Locked version: 1.11.0, 1.12.0
+      Patch source: https://www.drupal.org/files/issues/2024-01-15/civictheme-nav-a11y-3412345-12.patch
+      Rationale: Fixes WCAG 2.1 AA compliance issue with mobile menu focus trap
+      Removal criteria: Fixed in CivicTheme 1.13.0 per issue #3412345
+
+- [ ] C021 [MEDIUM] Composer patch - Custom banner height override
+      Locked version: 1.12.0
+      Patch source: patches/civictheme-banner-height.patch
+      Rationale: Client requirement for taller hero banners on landing pages
+      Removal criteria: Never (permanent customisation, re-apply on each upgrade)
+```
+
+### Handling Composer patches during upgrades
+
+When upgrading CivicTheme:
+
+1. **Review each patch** in the register against the target version's release notes
+2. **Test if patch still applies** – patches may fail on new versions
+3. **Check if patch is still needed** – the fix may be included upstream
+4. **Update the register**:
+   - Remove patches that are now included upstream
+   - Update `Locked version` for patches that still apply
+   - Note any patches that failed and need rework
+5. **Re-run pre-flight comparison** after updating patches to verify no other modifications exist
+
+### Impact on parent-theme modification detection
+
+When comparing the installed theme against a pristine copy, **apply the same
+Composer patches to the pristine copy** before diffing. This ensures only
+*manual* modifications (not patch-based changes) trigger the "parent theme
+modified" stop condition.
+
+---
+
 ### Upgrade note: CivicTheme 1.11+ split CSS bundles
 
 If a sub-theme renders bespoke Twig markup that uses CivicTheme classnames
