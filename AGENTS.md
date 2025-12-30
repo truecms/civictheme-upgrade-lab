@@ -10,6 +10,10 @@ Auto-generated from all feature plans. Last updated: 2025-11-29
 ## Project Structure
 
 ```text
+.skills/                     # AI assistant skills (self-contained instruction sets)
+  civictheme-upgrade/
+    SKILL.md                 # Skill definition for CivicTheme upgrades
+    references/              # Version-specific upgrade documentation
 .specify/                    # Templates, scripts, and constitution for AI tooling
   memory/
     constitution.md          # Framework governance and principles
@@ -36,6 +40,28 @@ specs/
 - Shell scripts: Bash 5.x compatible, shellcheck compliant
 
 <!-- MANUAL ADDITIONS START -->
+
+## Skills
+
+This repository includes AI-assistant skills in the `.skills/` directory. These are self-contained instruction sets designed for AI coding assistants (originally developed for Claude Code, but applicable to other AI tools).
+
+| Skill | Description | Location |
+|-------|-------------|----------|
+| **civictheme-upgrade** | Plan and execute CivicTheme version upgrades in Drupal projects | [`.skills/civictheme-upgrade/SKILL.md`](.skills/civictheme-upgrade/SKILL.md) |
+
+### civictheme-upgrade Skill
+
+The CivicTheme upgrade skill provides structured guidance for:
+
+- **Sequential version upgrades**: One CivicTheme release at a time (e.g., 1.10→1.11, 1.11→1.12)
+- **SDC migration**: Handling Single Directory Components introduced in 1.11+
+- **Twig syntax updates**: Converting legacy include paths to new SDC namespaces
+- **Build tooling changes**: Updating `package.json`, `build.js`, and Storybook configurations
+- **Customisation preservation**: Tracking and maintaining site-specific overrides
+
+The skill includes its own `references/` directory with version-specific documentation (`spec.md`, `tasks.md`, `playbook.md`) for each supported upgrade path.
+
+**Usage**: AI assistants should read the skill file when working on CivicTheme upgrades. The skill can be extended with project-specific context (e.g., custom theme location, existing customisations) via the `references/` directory.
 
 ## CivicTheme Upgrade Assistant Framework
 

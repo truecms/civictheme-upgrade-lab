@@ -210,4 +210,3 @@ search for them.
   designed to keep developers in control.
 - **Update the customisation register** after every upgrade so that future
   upgrades start from accurate information.
-
