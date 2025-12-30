@@ -3,8 +3,8 @@
 Auto-generated from all feature plans. Last updated: 2025-11-29
 
 ## Active Technologies
-- Git-tracked files only (no databases or external storage) (001-rely-contents-docs)
 
+- Git-tracked files only (no databases or external storage) (001-rely-contents-docs)
 - Bash 5.x (scaffolding scripts), Markdown documentation; applies to downstream Drupal projects using CivicTheme + Git, local file system, CivicTheme upstream documentation, Drupal + composer tooling in destination projects (001-rely-contents-docs)
 
 ## Project Structure
@@ -22,6 +22,7 @@ Auto-generated from all feature plans. Last updated: 2025-11-29
   templates/                 # Document templates (spec, plan, tasks, etc.)
 docs/
   civic-theme-upgrades/
+    AGENTS.md                # AI agent instructions for target projects
     customisations.md        # Canonical customisation register (template)
     planning.md              # Global upgrade documentation framework
     README.md                # Entry point for upgrade documentation
@@ -45,9 +46,9 @@ specs/
 
 This repository includes AI-assistant skills in the `.skills/` directory. These are self-contained instruction sets designed for AI coding assistants (originally developed for Claude Code, but applicable to other AI tools).
 
-| Skill | Description | Location |
-|-------|-------------|----------|
-| **civictheme-upgrade** | Plan and execute CivicTheme version upgrades in Drupal projects | [`.skills/civictheme-upgrade/SKILL.md`](.skills/civictheme-upgrade/SKILL.md) |
+| Skill                  | Description                                                      | Location                                                                     |
+|------------------------|------------------------------------------------------------------|------------------------------------------------------------------------------|
+| **civictheme-upgrade** | Plan and execute CivicTheme version upgrades in Drupal projects  | [`.skills/civictheme-upgrade/SKILL.md`](.skills/civictheme-upgrade/SKILL.md) |
 
 ### civictheme-upgrade Skill
 
@@ -62,6 +63,8 @@ The CivicTheme upgrade skill provides structured guidance for:
 The skill includes its own `references/` directory with version-specific documentation (`spec.md`, `tasks.md`, `playbook.md`) for each supported upgrade path.
 
 **Usage**: AI assistants should read the skill file when working on CivicTheme upgrades. The skill can be extended with project-specific context (e.g., custom theme location, existing customisations) via the `references/` directory.
+
+**For AI agents in target projects**: See [`docs/civic-theme-upgrades/AGENTS.md`](docs/civic-theme-upgrades/AGENTS.md) for detailed instructions on executing upgrades in destination Drupal projects.
 
 ## CivicTheme Upgrade Assistant Framework
 
@@ -87,6 +90,5 @@ The skill includes its own `references/` directory with version-specific documen
   - Use the per-version `spec.md` + `tasks.md` + `playbook.md` trio as the
     primary guide for upgrades, validating outcomes via checklists and
     repository inspection rather than relying on automated tests.
-
 
 <!-- MANUAL ADDITIONS END -->
