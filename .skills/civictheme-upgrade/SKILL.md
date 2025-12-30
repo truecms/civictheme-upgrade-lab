@@ -17,8 +17,55 @@ Assists with planning and executing CivicTheme upgrades in Drupal projects using
 
 ## Workflow Overview
 
+```text
+0. Pre-flight → 1. Discovery → 2. Planning → 3. Changes → 4. Validation
 ```
-1. Discovery → 2. Planning → 3. Changes → 4. Validation
+
+### Step 0: Pre-flight (Baseline Normalisation)
+
+Before any upgrade, ensure exact version pinning and detect parent-theme modifications:
+
+```bash
+# 1. Get INSTALLED version from composer.lock (authoritative source)
+composer show drupal/civictheme --locked | grep -E "^versions"
+
+# 2. Get DECLARED constraint from composer.json
+grep -A2 '"drupal/civictheme"' composer.json
+```
+
+**Constraint classification**:
+
+- **Exact** (OK): `1.12.0`, `1.12.0-rc1`
+- **Non-exact** (must normalise): `^1.12`, `~1.12`, `>=1.12`, `*`, `dev-*`
+
+**Check for parent-theme modifications** (since `web/themes/contrib/` is git-ignored):
+
+```bash
+# 1. Get exact version and copy installed theme
+CIVICTHEME_VERSION=$(composer show drupal/civictheme --locked --format=json | grep -o '"version": "[^"]*"' | head -1 | cut -d'"' -f4)
+cp -r web/themes/contrib/civictheme /tmp/civictheme-installed
+
+# 2. Get pristine copy via Composer
+mkdir -p /tmp/civictheme-pristine-project && cd /tmp/civictheme-pristine-project
+composer init --no-interaction --name="temp/check"
+composer require drupal/civictheme:$CIVICTHEME_VERSION --no-interaction
+cp -r vendor/drupal/civictheme /tmp/civictheme-pristine && cd -
+
+# 3. Compare (excluding node_modules, dist, generated files)
+diff -rq --exclude='node_modules' --exclude='dist' --exclude='package-lock.json' \
+  /tmp/civictheme-pristine /tmp/civictheme-installed
+```
+
+**If parent-theme modifications found**:
+
+1. Backup: `cp -r web/themes/contrib/civictheme /tmp/civictheme-backup-$(date +%Y%m%d)`
+2. Record as HIGH risk in `references/customisations.md`
+3. **STOP** and request developer decision
+
+**If no modifications and non-exact constraint**:
+
+```bash
+composer require drupal/civictheme:<VERSION_FROM_LOCK> --no-update
 ```
 
 ### Step 1: Discovery
@@ -26,8 +73,8 @@ Assists with planning and executing CivicTheme upgrades in Drupal projects using
 Identify current state and customisations:
 
 ```bash
-# Current CivicTheme version
-composer show drupal/civictheme | grep versions
+# Current CivicTheme version (use --locked for authoritative source)
+composer show drupal/civictheme --locked | grep -E "^versions"
 
 # Drupal core version (1.11+ requires ^10.2 || ^11)
 drush status --field=drupal-version
@@ -45,7 +92,7 @@ grep -rn "_slot %}" <subtheme>/templates/
 
 Read version-specific documentation:
 
-```
+```text
 references/versions/v<FROM>-to-v<TO>/
 ├── spec.md      # What & why (upstream changes, risks)
 ├── tasks.md     # Checklist (tickable items)
@@ -67,21 +114,23 @@ Apply upgrade in order:
 ### Step 4: Validation
 
 ```bash
-drush cr && drush updb && drush cim
-composer show drupal/civictheme | grep versions  # Verify exact version
+drush cr && drush updb && drush cim -y
+composer show drupal/civictheme --locked | grep -E "^versions"  # Verify exact version
 npm run build  # or ahoy fe
 ```
+
+**Success criteria**: Version output matches exact target version (e.g., `1.12.0`).
 
 Test: home page, navigation, search, forms, custom components.
 
 ## Version-Specific References
 
-| Upgrade Path | Key Changes | Reference |
-|--------------|-------------|-----------|
-| 1.10.0 → 1.11.0 | SDC migration, Twig namespace changes | `references/versions/v1.10.0-to-v1.11.0/` |
-| 1.11.0 → 1.12.0 | Security fixes, SDC refinements | `references/versions/v1.11.0-to-v1.12.0/` |
-| 1.12.0 → 1.12.1 | Patch release | `references/versions/v1.12.0-to-v1.12.1/` |
-| 1.12.1 → 1.12.2 | Patch release | `references/versions/v1.12.1-to-v1.12.2/` |
+| Upgrade Path    | Key Changes                           | Reference                                  |
+|-----------------|---------------------------------------|--------------------------------------------|
+| 1.10.0 → 1.11.0 | SDC migration, Twig namespace changes | `references/versions/v1.10.0-to-v1.11.0/`  |
+| 1.11.0 → 1.12.0 | Security fixes, SDC refinements       | `references/versions/v1.11.0-to-v1.12.0/`  |
+| 1.12.0 → 1.12.1 | Patch release                         | `references/versions/v1.12.0-to-v1.12.1/`  |
+| 1.12.1 → 1.12.2 | Patch release                         | `references/versions/v1.12.1-to-v1.12.2/`  |
 
 **Before starting any upgrade**, read the relevant `spec.md` and `tasks.md` for that version step.
 
@@ -114,6 +163,7 @@ Test: home page, navigation, search, forms, custom components.
 **Not supported in 1.11+**: `{% extends %}` and `{{ parent() }}` for CivicTheme components.
 
 Options:
+
 - **Override completely**: Copy full upstream template, apply customisations inline
 - **Remove override**: Use upstream component unchanged
 
@@ -142,6 +192,7 @@ Maintain at `docs/civic-theme-upgrades/customisations.md` with:
 ```
 
 Impact levels:
+
 - **HIGH**: Extended templates, structural changes
 - **MEDIUM**: Style overrides, custom components
 - **LOW**: Minor tweaks, configuration
@@ -155,6 +206,8 @@ Halt and seek developer input when:
 3. `{% extends %}` patterns found (requires refactoring decision)
 4. Build failures after tooling updates
 5. Test regressions detected
+6. **Parent theme modified**: `web/themes/contrib/civictheme` differs from pristine version
+7. **Dev/non-release version**: `composer.lock` shows `dev-*` or non-semver version
 
 ## Additional References
 
@@ -166,6 +219,6 @@ Halt and seek developer input when:
 
 ## External Links
 
-- CivicTheme docs: https://docs.civictheme.io
-- CivicTheme releases: https://www.drupal.org/project/civictheme/releases
-- Upgrade tools: https://github.com/civictheme/upgrade-tools
+- CivicTheme docs: <https://docs.civictheme.io>
+- CivicTheme releases: <https://www.drupal.org/project/civictheme/releases>
+- Upgrade tools: <https://github.com/civictheme/upgrade-tools>

@@ -15,6 +15,63 @@ real customisations in each destination project.
 - [ ] C001 Example sub-theme overrides (Twig, SCSS, JS) – replace with
       real items in destination projects.
 
+---
+
+## Recording parent-theme modifications
+
+If direct modifications have been made to the upstream CivicTheme parent
+theme (`web/themes/contrib/civictheme/`), these **MUST** be recorded here
+as **HIGH** risk entries. Parent-theme modifications will be **overwritten**
+during any upgrade and require special handling.
+
+### How to detect parent-theme modifications
+
+During pre-flight checks, compare the installed `web/themes/contrib/civictheme/`
+against a pristine copy of the version shown in `composer.lock`. Any differences
+indicate local modifications.
+
+### Recording format for parent-theme modifications
+
+Use this format for each modification found:
+
+```markdown
+- [ ] C0XX [HIGH] Parent theme modification - web/themes/contrib/civictheme/<path>
+      Locked version: <version from composer.lock>
+      Change: <brief description of what was modified>
+      WARNING: Will be overwritten on upgrade – requires migration strategy
+```
+
+**Example entries**:
+
+```markdown
+- [ ] C010 [HIGH] Parent theme modification - web/themes/contrib/civictheme/templates/block/civictheme-banner.html.twig
+      Locked version: 1.11.0
+      Change: Added custom CTA button below banner title
+      WARNING: Will be overwritten on upgrade – requires migration strategy
+
+- [ ] C011 [HIGH] Parent theme modification - web/themes/contrib/civictheme/components/02-molecules/navigation/navigation.twig
+      Locked version: 1.11.0
+      Change: Modified mobile menu breakpoint logic
+      WARNING: Will be overwritten on upgrade – requires migration strategy
+```
+
+### Handling parent-theme modifications during upgrades
+
+When parent-theme modifications are detected:
+
+1. **STOP** the upgrade process and notify the developer
+2. The developer must decide how to handle each modification:
+   - **Migrate to sub-theme**: Move the customisation to the sub-theme (preferred)
+   - **Re-apply after upgrade**: Accept that the change will be lost and re-apply
+     manually after upgrading
+   - **Create a patch**: Generate a patch file that can be re-applied post-upgrade
+   - **Abandon**: If the customisation is no longer needed, remove the register entry
+3. Document the decision in the `Change:` field
+4. Only proceed with the upgrade after all parent-theme modifications have a
+   documented resolution strategy
+
+---
+
 ### Upgrade note: CivicTheme 1.11+ split CSS bundles
 
 If a sub-theme renders bespoke Twig markup that uses CivicTheme classnames
