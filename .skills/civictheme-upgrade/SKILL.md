@@ -23,46 +23,62 @@ Assists with planning and executing CivicTheme upgrades in Drupal projects using
 
 ### Step 0: Pre-flight (Baseline Normalisation)
 
-Before any upgrade, ensure exact version pinning and detect parent-theme modifications:
+Before any upgrade, ensure exact version pinning and detect parent-theme modifications.
+
+**1. Get versions and locate theme**:
 
 ```bash
-# 1. Get INSTALLED version from composer.lock (authoritative source)
-composer show drupal/civictheme --locked | grep -E "^versions"
+CIVICTHEME_VERSION=$(composer show drupal/civictheme --locked --format=json | grep -o '"version": "[^"]*"' | head -1 | cut -d'"' -f4)
+INSTALLED_THEME=$(composer show --path drupal/civictheme)
+echo "Version: $CIVICTHEME_VERSION | Path: $INSTALLED_THEME"
 
-# 2. Get DECLARED constraint from composer.json
+# Check constraint type in composer.json
 grep -A2 '"drupal/civictheme"' composer.json
 ```
 
-**Constraint classification**:
+**Constraint classification**: Exact (`1.12.0`) = OK. Non-exact (`^1.12`, `~1.12`, `*`) = must normalise after comparison.
 
-- **Exact** (OK): `1.12.0`, `1.12.0-rc1`
-- **Non-exact** (must normalise): `^1.12`, `~1.12`, `>=1.12`, `*`, `dev-*`
-
-**Check for parent-theme modifications** (since `web/themes/contrib/` is git-ignored):
+**2. Detect Composer patches** (these are legitimate customisations):
 
 ```bash
-# 1. Get exact version and copy installed theme
-CIVICTHEME_VERSION=$(composer show drupal/civictheme --locked --format=json | grep -o '"version": "[^"]*"' | head -1 | cut -d'"' -f4)
-cp -r web/themes/contrib/civictheme /tmp/civictheme-installed
-
-# 2. Get pristine copy via Composer
-mkdir -p /tmp/civictheme-pristine-project && cd /tmp/civictheme-pristine-project
-composer init --no-interaction --name="temp/check"
-composer require drupal/civictheme:$CIVICTHEME_VERSION --no-interaction
-cp -r vendor/drupal/civictheme /tmp/civictheme-pristine && cd -
-
-# 3. Compare (excluding node_modules, dist, generated files)
-diff -rq --exclude='node_modules' --exclude='dist' --exclude='package-lock.json' \
-  /tmp/civictheme-pristine /tmp/civictheme-installed
+# Check for patches in composer.json
+grep -A50 '"patches"' composer.json | grep -A10 '"drupal/civictheme"' || echo "No patches"
+# Check for external patches file
+grep '"patches-file"' composer.json
 ```
 
-**If parent-theme modifications found**:
+**Record any patches found** – they must be applied to the pristine copy for fair comparison.
 
-1. Backup: `cp -r web/themes/contrib/civictheme /tmp/civictheme-backup-$(date +%Y%m%d)`
-2. Record as HIGH risk in `references/customisations.md`
-3. **STOP** and request developer decision
+**3. Build pristine copy (with same patches)**:
 
-**If no modifications and non-exact constraint**:
+```bash
+WORKDIR="/tmp/civictheme-compare"
+rm -rf "$WORKDIR" && mkdir -p "$WORKDIR/pristine-project"
+cp -R "$INSTALLED_THEME" "$WORKDIR/installed"
+
+cd "$WORKDIR/pristine-project"
+composer init --no-interaction --name="temp/check"
+# If patches exist: add cweagans/composer-patches and copy patch config
+composer require drupal/civictheme:$CIVICTHEME_VERSION --no-interaction
+PRISTINE=$(composer show --path drupal/civictheme)
+cp -R "$PRISTINE" "$WORKDIR/pristine"
+cd -
+```
+
+**4. Portable diff** (remove noisy dirs from copies first):
+
+```bash
+rm -rf "$WORKDIR/installed/node_modules" "$WORKDIR/pristine/node_modules"
+rm -rf "$WORKDIR/installed/.npm" "$WORKDIR/pristine/.npm"
+rm -rf "$WORKDIR/installed/storybook-static" "$WORKDIR/pristine/storybook-static"
+# NOTE: Do NOT remove dist/ by default – compiled asset differences ARE meaningful
+
+diff -rq "$WORKDIR/pristine" "$WORKDIR/installed"
+```
+
+**If differences found** (after patch-aware comparison): Parent theme manually modified. Backup, record as HIGH risk, **STOP** for developer decision.
+
+**If no differences and non-exact constraint**:
 
 ```bash
 composer require drupal/civictheme:<VERSION_FROM_LOCK> --no-update
@@ -206,8 +222,16 @@ Halt and seek developer input when:
 3. `{% extends %}` patterns found (requires refactoring decision)
 4. Build failures after tooling updates
 5. Test regressions detected
-6. **Parent theme modified**: `web/themes/contrib/civictheme` differs from pristine version
+6. **Parent theme modified**: Differs from pristine **after applying same Composer patches**
 7. **Dev/non-release version**: `composer.lock` shows `dev-*` or non-semver version
+8. **Composer patches exist**: Record patches in register; ensure they're applied in pristine comparison
+
+**DO NOT**:
+
+- Run `composer update` globally—only update CivicTheme deliberately
+- Modify `web/themes/contrib/civictheme` directly—treat as overwriteable
+- Run `npm install` inside `web/themes/contrib/civictheme`—masks real diffs
+- Flag diff as "modification" without applying same patches to pristine
 
 ## Additional References
 

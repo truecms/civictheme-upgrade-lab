@@ -165,53 +165,63 @@ steps:
 2. **Pre-flight: Version baseline** (CRITICAL - do this first):
    - Get the INSTALLED version from `composer.lock` (authoritative source):
      `composer show drupal/civictheme --locked | grep -E "^versions"`
+   - Locate the installed theme path:
+     `composer show --path drupal/civictheme`
    - Get the DECLARED constraint from `composer.json`:
      `grep -A2 '"drupal/civictheme"' composer.json`
    - If `composer.json` uses non-exact constraints (^, ~, *, ranges), note
      this for normalisation AFTER the parent-theme check.
 
-3. **Pre-flight: Parent-theme modification check** (CRITICAL):
-   - Check if the upstream CivicTheme (`web/themes/contrib/civictheme/`) has
-     been directly modified by comparing to a pristine copy of the locked
-     version.
+3. **Pre-flight: Detect Composer patches** (CRITICAL):
+   - Check if the project applies patches to CivicTheme:
+     `grep -A50 '"patches"' composer.json | grep -A10 '"drupal/civictheme"'`
+   - Check for external patches file: `grep '"patches-file"' composer.json`
+   - Record any patches found in the customisation register (they are
+     legitimate customisations that must be tracked).
+
+4. **Pre-flight: Parent-theme modification check** (CRITICAL):
+   - Compare the installed CivicTheme against a pristine copy **with the
+     same Composer patches applied**. This avoids false positives.
+   - Only flag as "modified" if differences exist AFTER applying patches.
    - If modifications are found: copy the modified theme to a backup folder,
      record each modification as a HIGH-risk entry in the customisation
      register, then STOP and ask for my decision.
    - If no modifications are found and `composer.json` is non-exact:
      normalise it to pin the exact installed version.
 
-4. **Discovery**: Identify the project's current state:
+5. **Discovery**: Identify the project's current state:
    - Locate the CivicTheme installation (usually `web/themes/contrib/civictheme/`).
    - Identify the sub-theme (usually under `web/themes/custom/`).
    - Scan for CivicTheme customisations in the sub-theme (Twig overrides,
      SCSS/CSS, JS, configuration).
 
-5. **Customisation register**: Update `docs/civic-theme-upgrades/customisations.md`:
+6. **Customisation register**: Update `docs/civic-theme-upgrades/customisations.md`:
    - If it is a template, populate it with the discovered customisations.
    - If it already exists, verify it is current and add any missing items.
    - Assign stable IDs (C001, C002, etc.) to each customisation.
-   - Include any parent-theme modifications found in step 3.
+   - Include any parent-theme modifications found in step 4.
+   - Include any Composer patches found in step 3.
 
-6. **Target version**: Confirm the target CivicTheme version I want to
+7. **Target version**: Confirm the target CivicTheme version I want to
    upgrade to. If I have not specified it, suggest the next incremental
    release.
 
-7. **Per-version documentation**: Navigate to or create the appropriate
+8. **Per-version documentation**: Navigate to or create the appropriate
    version directory under `docs/civic-theme-upgrades/versions/`:
    - If the directory exists, read `spec.md`, `tasks.md` and `playbook.md`.
    - If it does not exist, create it following the pattern
      `v<CURRENT>-to-v<TARGET>/` and scaffold the spec/tasks/playbook trio.
 
-8. **Planning**: Work through the spec → tasks → playbook flow:
+9. **Planning**: Work through the spec → tasks → playbook flow:
    - Analyse upstream changes for the target version.
    - Cross-reference with the customisation register to identify risks.
    - Propose concrete tasks and execution steps.
 
-9. **Execution** (when I confirm): Follow the playbook steps in a safe
-   environment (feature branch, dev/staging), pausing for my review at
-   high-risk steps.
+10. **Execution** (when I confirm): Follow the playbook steps in a safe
+    environment (feature branch, dev/staging), pausing for my review at
+    high-risk steps.
 
-10. **Verification**: After completion, verify the upgrade succeeded:
+11. **Verification**: After completion, verify the upgrade succeeded:
     - Run `composer show drupal/civictheme --locked | grep -E "^versions"`
     - Confirm the version matches the exact target version.
     - Clear caches and test critical paths.
@@ -233,7 +243,9 @@ search for them.
 - **Update the customisation register** after every upgrade so that future
   upgrades start from accurate information.
 - **Pay attention to the pre-flight checks** – if the AI reports parent-theme
-  modifications or non-exact version constraints, address these before
-  proceeding with the upgrade.
+  modifications, Composer patches, or non-exact version constraints, address
+  these before proceeding with the upgrade.
 - **Always verify versions** before and after the upgrade using
   `composer show drupal/civictheme --locked`.
+- **Record Composer patches** as customisations – they must be tracked and
+  applied to the pristine copy during parent-theme modification checks.
